@@ -13,6 +13,9 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <to8to_spring_cloud_version>1.5.14</to8to_spring_cloud_version>
+
+        <easy-rules-core-version>3.2.0</easy-rules-core-version>
+        <easy-rules-mvel-version>3.2.0</easy-rules-mvel-version>
     </properties>
 
     <dependencies>
@@ -27,6 +30,13 @@
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-tools</artifactId>
             <version>1.9.3</version>
+        </dependency>
+        <dependency>
+            <groupId>t8t.tbt</groupId>
+            <artifactId>t8t-tbt-tls-api</artifactId>
+            <version>33-sc</version>
+            <!--            <version>${project.parent.version}</version>-->
+<!--            <scope>compile</scope>-->
         </dependency>
 
         <!--start java解析excel-->
@@ -73,6 +83,16 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.47</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jeasy</groupId>
+            <artifactId>easy-rules-core</artifactId>
+            <version>${easy-rules-mvel-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jeasy</groupId>
+            <artifactId>easy-rules-mvel</artifactId>
+            <version>${easy-rules-mvel-version}</version>
         </dependency>
 
 

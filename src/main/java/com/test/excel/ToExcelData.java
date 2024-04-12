@@ -6,9 +6,9 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-class ExcelStudentData {
+class ToExcelData {
     @ExcelProperty("姓名")
-    private String name;
+    private String sql;
     @ExcelProperty("生日")
     private Date birthday;
 

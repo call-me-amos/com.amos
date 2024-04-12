@@ -24,7 +24,7 @@ public class SmartChatFileUtil {
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("============  start");
-//        writeToExcel("E:\\test\\顾问聊天记录2(2).xlsx", "E:\\test\\temp.xlsx");
+        writeToExcel("C:\\Users\\amos.tong\\Desktop\\条件跳转\\智能应答策略2.0.xlsx", "E:\\test\\temp.xlsx");
 
         // 智能客服聊天记录解析
         List<ChatInstance> chatInstanceList = parseSmartChat();
@@ -230,11 +230,10 @@ public class SmartChatFileUtil {
 
     }
 
-    private static List<ExcelStudentData> data() {
-        List<ExcelStudentData> list = new ArrayList<>();
+    private static List<ToExcelData> data() {
+        List<ToExcelData> list = new ArrayList<>();
         for (int i = 0; i < 65535; i++) {
-            ExcelStudentData data = new ExcelStudentData();
-            data.setName("Helen" + i);
+            ToExcelData data = new ToExcelData();
             data.setBirthday(new Date());
             data.setSalary(0.56);
             list.add(data);

@@ -11,19 +11,19 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Data
 public class ExcelModel implements Serializable{
-    @ExcelProperty(value="编号-初始列为1", index= 1)
+    @ExcelProperty(value="策略名称", index= 1)
     private String id;
 
-    @ExcelProperty(value="名称",index=2)
+    @ExcelProperty(value="规则条件",index=2)
     private String name;
 
-    @ExcelProperty(value="来源",index=3)
+    @ExcelProperty(value="跳转策略",index=3)
     private String origin;
 
-    @ExcelProperty(value="既率(P)",index=4)
+    @ExcelProperty(value="询问槽位",index=4)
     private String probability;
 
-    @ExcelProperty(value="影响(I)",index=5)
+    @ExcelProperty(value="话术内容",index=5)
     private String effect;
 
 }

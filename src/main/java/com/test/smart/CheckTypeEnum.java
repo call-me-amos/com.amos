@@ -35,6 +35,7 @@ public enum CheckTypeEnum {
     PHONE("7!711!71102!17", "电话"),
     WHOLE_HOUSE("7!711!71102!18", "预约全屋定制"),
     HARD_DECORATION("7!711!71102!19", "硬装需求"),
+    IS_COMPLETION("7!711!71102!20", "是否交房"),
     PHONE_NUMBER("7!711!71102!21", "手机号"),
     DECORATION_USE("7!711!71102!22", "装修用途"),
     BACK_HOME_TIME("7!711!71102!23", "外出回来时间"),
@@ -122,6 +123,11 @@ public enum CheckTypeEnum {
     OPENING_REMARKS_CLARITY_FOR_DECORATION_USE("7!711!71102!58", "开场白-澄清槽位-装修用途", "7!711!71102!22"),
     OPENING_REMARKS_CLARITY_FOR_DECORATION_TIME("7!711!71102!59", "开场白-澄清槽位-装修时间", "7!711!71102!1"),
     OPENING_REMARKS_CLARITY_FOR_TIMEOUT("7!711!71102!69", "开场白-澄清槽位-超时促开口话术"),
+
+    DEMAND_TYPE("7!711!71102!84","需求类型"),
+    HOUSE_TYPE_NOT_RIGHT_TIME("7!711!71102!85","房屋类型-暂不方便沟通"),
+    VALUE_POINT_HOUSE_TYPE_("7!711!71102!86","价值点-房屋类型-追问1"),
+    ENGINEERING_QUANTITY_WHOLE_BOARD_REFORM("7!711!71102!87","工程量（整局改）"),
 
     GENDER("7!711!71102!201","性别"),
     COMPLETION("7!711!71102!202","交房类型"),

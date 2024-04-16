@@ -130,6 +130,7 @@ public enum CheckTypeEnum {
     ENGINEERING_QUANTITY_WHOLE_BOARD_REFORM("7!711!71102!87","工程量（整局改）"),
     COMMUNICATE_TIME("7!711!71102!88","方便沟通时间"),
     IS_TIME_COMMUNICATE("7!711!71102!89","是否方便沟通"),
+    HOUSE_TYPE_NEW_CLARITY_1("7!711!71102!90","房屋类型-新房澄清问1"),
 
     GENDER("7!711!71102!201","性别"),
     COMPLETION("7!711!71102!202","交房类型"),

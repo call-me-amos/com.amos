@@ -74,6 +74,17 @@ public class ProcessOnToRow {
 //        excelModelFromProcessOn.forEach(e->{
 //            log.info("{}", JSONObject.toJSONString(e));
 //        });
+
+
+        LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
+        leafRule.put(0, "99999-下一槽位默认调整槽位--测试使用");// 规则名称
+        leafRule.put(1, "skipSlot != ''");//规则条件
+        leafRule.put(2, "指定跳转");//跳转策略
+        leafRule.put(3, "姓氏");//跳转槽位
+        //log.info("新增一条规则：leafRule={}", JSONObject.toJSONString(leafRule));
+        excelModelFromProcessOn.add(leafRule);
+
+
         return excelModelFromProcessOn;
     }
 
@@ -124,13 +135,13 @@ public class ProcessOnToRow {
             }
 
             String ruleCondition = StringUtils.isEmpty(skipSlot)? fatherRule: "(跳过槽位 <> " + skipSlot + ") and "+fatherRule;
-            // 新增一个叶子结点：策略名称	规则条件	跳转策略	跳转槽位    核需话术    超时话术
+            // 新增一个叶子结点：规则名称	规则条件	跳转策略	跳转槽位    核需话术    超时话术
             LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
             int index = ruleIndex.incrementAndGet();
 //            if(index == 42){
 //                index = index+1-1;
 //            }
-            leafRule.put(0, index + "-"+node.getId());//规则条件 暂时用id替代
+            leafRule.put(0, index + "-"+node.getId());//规则名称 暂时用id替代
             leafRule.put(1, ruleCondition);//规则条件
             leafRule.put(2, nextStrategyType);//跳转策略
             leafRule.put(3, nextAskSlot);//跳转槽位

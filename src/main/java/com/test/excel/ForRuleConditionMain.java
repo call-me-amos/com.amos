@@ -34,7 +34,7 @@ public class ForRuleConditionMain {
 
     // pos脑图文件路径
     //private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
-    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414 (11).pos";
+    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414 (12).pos";
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("============  start");

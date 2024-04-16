@@ -62,6 +62,7 @@ public class ProcessOnToRow {
 
                 if(CollectionUtils.isNotEmpty(secondNode.getChildren())){
                     String finalFatherRule1 = "";
+                    sortForProcessOn(secondNode);
                     secondNode.getChildren().forEach(children->{
                         parseNode(children, finalFatherRule1);
                     });
@@ -78,7 +79,7 @@ public class ProcessOnToRow {
 
         LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
         leafRule.put(0, "99999-下一槽位默认调整槽位--测试使用");// 规则名称
-        leafRule.put(1, "skipSlot != ''");//规则条件
+        leafRule.put(1, "跳过槽位 <> ''");//规则条件
         leafRule.put(2, "指定跳转");//跳转策略
         leafRule.put(3, "姓氏");//跳转槽位
         //log.info("新增一条规则：leafRule={}", JSONObject.toJSONString(leafRule));
@@ -117,6 +118,7 @@ public class ProcessOnToRow {
 //            }
             if(CollectionUtils.isNotEmpty(node.getChildren())){
                 String finalFatherRule1 = fatherRule;
+                sortForProcessOn(node);
                 node.getChildren().forEach(children->{
                     parseNode(children, finalFatherRule1);
                 });
@@ -150,18 +152,19 @@ public class ProcessOnToRow {
             
             if(CollectionUtils.isNotEmpty(node.getChildren())){
                 parseForRobotAskList(nextAskSlot, node.getChildren());
-                
+                sortForProcessOn(node);
                 node.getChildren().forEach(childrenNode ->{
                     parseNode(childrenNode, "");
                 });
             }
-        } else if(title.startsWith("条件：")){
+        } else if(title.startsWith("条件")){
             if(StringUtils.isNotEmpty(fatherRule)){
                 fatherRule = fatherRule + " and ";
             }
-            fatherRule = fatherRule + " (" + title.replace("条件：","") + ")";
+            fatherRule = fatherRule + " (" + title.substring(4) + ")";
             if(CollectionUtils.isNotEmpty(node.getChildren())){
                 String finalFatherRule = fatherRule;
+                sortForProcessOn(node);
                 node.getChildren().forEach(children->{
                     parseNode(children, finalFatherRule);
                 });
@@ -173,11 +176,30 @@ public class ProcessOnToRow {
         }
     }
 
+    private static void sortForProcessOn(ProcessOnNode node) {
+        node.getChildren().sort(new Comparator<ProcessOnNode>() {
+            @Override
+            public int compare(ProcessOnNode o1, ProcessOnNode o2) {
+                int sort1 = 0;
+                if(o1.getTitle().startsWith("条件")){
+                    sort1 = Integer.parseInt(o1.getTitle().substring(4, 5));
+                }
+
+                int sort2 = 0;
+                if(o2.getTitle().startsWith("条件")){
+                    sort2 = Integer.parseInt(o2.getTitle().substring(4, 5));
+                }
+                return sort1-sort2;
+            }
+        });
+    }
+
     private static void parseForRobotAskList(String nextAskSlot, List<ProcessOnNode> children) {
         Map<String, List<JSONObject>> robotAsk = new HashMap<>();
         for (ProcessOnNode node: children) {
             if(node.getTitle().startsWith("核需话术")){
                 List<JSONObject> replyList = new ArrayList<>();
+                sortForProcessOn(node);
                 node.getChildren().forEach(subNode->{
                     JSONObject reply = new JSONObject();
                     reply.put("delayTime", subNode.getTitle().split("=")[1]);
@@ -188,6 +210,7 @@ public class ProcessOnToRow {
                 robotAsk.put("replyList", replyList);
             } else if(node.getTitle().startsWith("超时话术")){
                 List<JSONObject> noResponseList = new ArrayList<>();
+                sortForProcessOn(node);
                 node.getChildren().forEach(subNode->{
                     JSONObject reply = new JSONObject();
                     reply.put("delayTime", subNode.getTitle().split("=")[1]);

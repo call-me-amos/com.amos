@@ -9,6 +9,7 @@ import com.test.file.ProcessOnToRow;
 import com.test.smart.CheckTypeEnum;
 import io.netty.util.internal.ThrowableUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ import java.util.*;
  */
 @Slf4j
 public class ForRuleConditionMain {
-    private static final Map<String, String> PARAMETER_MAP = getInitSlot();
+    public static final Map<String, String> PARAMETER_MAP = getInitSlot();
     private static final Set<String> NO_CONFIG_NAME = Sets.newHashSet();
     private static final String FROM_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\智能应答策略2.0-7.xlsx";
     private static final String TO_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\temp.xlsx";
@@ -66,6 +67,9 @@ public class ForRuleConditionMain {
                 List<ToExcelData> toExcelDataList = new ArrayList<>();
         String versionNo = String.valueOf(System.currentTimeMillis());
         excelModelFromFileList.forEach(row -> {
+            if(row.get(0).equals("99999-下一槽位默认调整槽位--测试使用")){
+                System.out.println("");
+            }
             StringBuffer sb = new StringBuffer();
             sb.append("(\"");
             sb.append(versionNo);
@@ -140,17 +144,31 @@ public class ForRuleConditionMain {
                 } else {
                     values = Arrays.asList(valuesString);
                 }
-                mvelExpressionBuilder.append(findExpressName(variableName)).append(".contains(");
+                StringBuilder subMvelExpressionBuilder = new StringBuilder();
+                subMvelExpressionBuilder.append("(");
                 for (String value : values) {
                     value= getStringWithSingleQuotationMark(value);
-                    mvelExpressionBuilder.append(value).append(", ");
+                    subMvelExpressionBuilder
+                            .append("!")
+                            .append(findExpressName(variableName))
+                            .append(".contains(")
+                            .append(value)
+                            .append(")")
+                            .append("and");
                 }
-                mvelExpressionBuilder.delete(mvelExpressionBuilder.length() - 2, mvelExpressionBuilder.length());
-                mvelExpressionBuilder.append(")");
+                subMvelExpressionBuilder.delete(subMvelExpressionBuilder.length() - 3, subMvelExpressionBuilder.length());
+                subMvelExpressionBuilder.append(")");
+
+                String newStr = fillQuote(part, subMvelExpressionBuilder);
+                mvelExpressionBuilder.append(newStr);
             } else if (part.contains(" in ")) {
                 String[] tokens = part.split(" in ");
                 String variableName = tokens[0].trim();
                 String valuesString = tokens[1].trim();
+                variableName = variableName.replace("（", "(");
+                variableName = variableName.replace("）", ")");
+                variableName = variableName.replace("(", "");
+
                 valuesString = valuesString.replace("（", "(");
                 valuesString = valuesString.replace("）", ")");
                 List<String> values;
@@ -161,13 +179,22 @@ public class ForRuleConditionMain {
                 } else {
                     values = Arrays.asList(valuesString);
                 }
-                mvelExpressionBuilder.append(findExpressName(variableName)).append(".contains(");
+                StringBuilder subMvelExpressionBuilder = new StringBuilder();
+                subMvelExpressionBuilder.append("(");
                 for (String value : values) {
                     value= getStringWithSingleQuotationMark(value);
-                    mvelExpressionBuilder.append(value).append(", ");
+                    subMvelExpressionBuilder
+                            .append(findExpressName(variableName))
+                            .append(".contains(")
+                            .append(value)
+                            .append(")")
+                            .append("||");
                 }
-                mvelExpressionBuilder.delete(mvelExpressionBuilder.length() - 2, mvelExpressionBuilder.length());
-                mvelExpressionBuilder.append(")");
+                subMvelExpressionBuilder.delete(subMvelExpressionBuilder.length() - 2, subMvelExpressionBuilder.length());
+                subMvelExpressionBuilder.append(")");
+
+                String newStr = fillQuote(part, subMvelExpressionBuilder);
+                mvelExpressionBuilder.append(newStr);
             } else if (part.contains("=")) {
                 String[] tokens = part.split("=");
                 String variableName = tokens[0].trim();
@@ -236,7 +263,62 @@ public class ForRuleConditionMain {
         }
     }
 
+    // 补全左右括号
+    private static String fillQuote(String part, StringBuilder subMvelExpressionBuilder) {
+        int initLeftQuoteSize = countOccurrences(part, '(');
+        int initRightQuoteSize = countOccurrences(part, ')');
+        int initDiff = initLeftQuoteSize - initRightQuoteSize;
+        int endLeftQuoteSize = countOccurrences(subMvelExpressionBuilder.toString(), '(');
+        int endRightQuoteSize = countOccurrences(subMvelExpressionBuilder.toString(), ')');
+        int endDiff = endLeftQuoteSize - endRightQuoteSize;
+        String newStr = "";
+        if(initDiff == endDiff){
+            newStr = subMvelExpressionBuilder.toString();
+        } else if (initDiff > endDiff){
+            newStr = appendCharacters(1, subMvelExpressionBuilder.toString(), '(', initDiff - endDiff);
+        } else {
+            newStr = appendCharacters(2, subMvelExpressionBuilder.toString(), ')', endDiff - initDiff);
+        }
+        return newStr;
+    }
+
+    // java判断str包含字符A的个数
+    public static int countOccurrences(String str, char targetChar) {
+        int count = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == targetChar) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // 判断字符串包含指定字符的个数，如果不够，在字符串后面追加缺失个数
+    public static String appendCharacters(int direction, String str, char targetChar, int count) {
+        if(count == 0){
+            return str;
+        }
+        StringBuilder sb = new StringBuilder();
+        // 前面追加
+        if(1== direction){
+            for (int i = 0; i < count; i++) {
+                sb.append(targetChar);
+            }
+            sb.append(str);
+        } else {
+            // 后面追加
+            sb.append(str);
+            for (int i = 0; i < count; i++) {
+                sb.append(targetChar);
+            }
+        }
+        return sb.toString();
+    }
+
     private static String getStringWithSingleQuotationMark(String value, String expressName) {
+        if("''".equals(value)){
+            return value;
+        }
         if (expressName.endsWith("_VALUE")
                 || Arrays.asList("currentIntention", "currentIntentionList", "currentAskSlot", "skipSlot",
                 "(currentIntention", "(currentIntentionList", "(currentAskSlot","(skipSlot").contains(expressName)) {

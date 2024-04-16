@@ -1,6 +1,5 @@
 package com.test.rule;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.jeasy.rules.api.Facts;
 import org.jeasy.rules.api.Rule;
@@ -10,28 +9,23 @@ import org.jeasy.rules.core.DefaultRulesEngine;
 import org.jeasy.rules.mvel.MVELRule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class RuleTest {
-    private static final String express_str = "currentAskSlot=='房屋类型' " +
-            "&& currentIntentionList.contains('QA问答') " +
-            "&& HOUSE_TYPE_TIMES==1 " +
-            "&& HOUSE_TYPE_VALUE=='毛坯' " +
-            "&& LAST_NAME_TIMES != 1";
-    private static final String param_str = "{\"LAST_NAME_VALUE\":\"\",\"LAST_NAME_TIMES\":\"\",\"HOUSE_TYPE_MAKE_DETAIL_INQUIRY_1_TIMES\":\"\",\"currentIntention\":\"回复房屋信息\",\"HOUSE_TYPE_TIMES\":1,\"HOUSE_TYPE_VALUE\":\"毛坯\",\"DECORATION_USE_VALUE\":\"\",\"currentAskSlot\":\"房屋类型\"}";
-    private static void test(){
+    private static final String express_str = "HOUSE_TYPE_VALUE.contains('毛坯1') || HOUSE_TYPE_VALUE.contains('简装房')";
+    private static final String param_str = "{\"HOUSE_TYPE_VALUE\":0,\"HOUSE_TYPE_VALUE\":\"毛坯,旧房翻新,老庭院\"}";
+
+    private static void test() {
         List<String> tt = new ArrayList<>();
         tt.add("回复房屋信息");
         tt.add("QA问答");
         // 创建事实对象
         Facts facts = new Facts();
-        facts.put("currentAskSlot", "房屋类型");
-        facts.put("currentIntentionList", tt);
+//        facts.put("currentAskSlot", "房屋类型");
+//        facts.put("currentIntentionList", tt);
 
-        JSONObject param_json = (JSONObject)JSONObject.parse(param_str);
-        param_json.forEach((key,value) ->{
+        JSONObject param_json = (JSONObject) JSONObject.parse(param_str);
+        param_json.forEach((key, value) -> {
             facts.put(key, value);
         });
         fire(facts, express_str);
@@ -39,24 +33,6 @@ public class RuleTest {
 
     public static void main(String[] args) {
         test();
-//        Facts facts = new Facts();
-//
-//        facts.put("HOUSE_TYPE_TIMES", "1");
-//        facts.put("currentAskSlot", "房屋类型");
-//        facts.put("HOUSE_TYPE_VALUE", "毛坯");
-//        facts.put("LAST_NAME_TIMES", "0");
-//
-//
-//
-//        facts.put("name", Arrays.asList("回复房屋信息", "QA问答", "旧房改造"));
-//        facts.put("age", "1122");
-//
-//        Person person = new Person();
-//        person.setBookName(Arrays.asList("11", "22", "33"));
-//        facts.put("person", person);
-//
-//        // 执行规则引擎
-//        fire(facts);
     }
 
     public static void fire(Facts facts) {
@@ -107,7 +83,7 @@ public class RuleTest {
         // 创建规则引擎
         Rules rules = new Rules();
         Rule rule1 = new MVELRule().name("规则1").when(mvelExpression1).then("ruleName='规则1';");
-       rules.register(rule1);
+        rules.register(rule1);
 
         // 创建规则引擎
         RulesEngine rulesEngine = new DefaultRulesEngine();

@@ -37,7 +37,6 @@ public class ProcessOnToRow {
      * 跳过槽位，类似于根节点
      */
     private static String skipSlot = "";
-    private static List<String> skipSlotMap = Arrays.asList("开场白","房屋类型");
 
     public static void main(String[] args) {
         getExcelModelFromProcessOn();
@@ -54,7 +53,7 @@ public class ProcessOnToRow {
                     || secondNode.getTitle().startsWith("开场白")
                     || secondNode.getTitle().startsWith("房屋类型")){
                 if(secondNode.getTitle().startsWith("开场白")){
-                    skipSlot = "开场白";
+                    skipSlot = "开场白-澄清槽位";
                 } else if(secondNode.getTitle().startsWith("房屋类型")){
                     skipSlot = "房屋类型";
                 } else {
@@ -127,7 +126,11 @@ public class ProcessOnToRow {
             String ruleCondition = StringUtils.isEmpty(skipSlot)? fatherRule: "(跳过槽位 <> " + skipSlot + ") and "+fatherRule;
             // 新增一个叶子结点：策略名称	规则条件	跳转策略	跳转槽位    核需话术    超时话术
             LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
-            leafRule.put(0, ruleIndex.incrementAndGet() + "-"+node.getId());//规则条件 暂时用id替代
+            int index = ruleIndex.incrementAndGet();
+//            if(index == 42){
+//                index = index+1-1;
+//            }
+            leafRule.put(0, index + "-"+node.getId());//规则条件 暂时用id替代
             leafRule.put(1, ruleCondition);//规则条件
             leafRule.put(2, nextStrategyType);//跳转策略
             leafRule.put(3, nextAskSlot);//跳转槽位

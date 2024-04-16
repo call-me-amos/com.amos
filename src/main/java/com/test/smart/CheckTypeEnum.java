@@ -128,6 +128,8 @@ public enum CheckTypeEnum {
     HOUSE_TYPE_NOT_RIGHT_TIME("7!711!71102!85","房屋类型-暂不方便沟通"),
     VALUE_POINT_HOUSE_TYPE_("7!711!71102!86","价值点-房屋类型-追问1"),
     ENGINEERING_QUANTITY_WHOLE_BOARD_REFORM("7!711!71102!87","工程量（整局改）"),
+    COMMUNICATE_TIME("7!711!71102!88","方便沟通时间"),
+    IS_TIME_COMMUNICATE("7!711!71102!89","是否方便沟通"),
 
     GENDER("7!711!71102!201","性别"),
     COMPLETION("7!711!71102!202","交房类型"),

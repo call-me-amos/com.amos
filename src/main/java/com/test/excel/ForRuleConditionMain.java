@@ -34,7 +34,7 @@ public class ForRuleConditionMain {
 
     // pos脑图文件路径
     //private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
-    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414 (10).pos";
+    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414 (11).pos";
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("============  start");
@@ -84,15 +84,15 @@ public class ForRuleConditionMain {
             sb.append("\"),");
             // TODO 话术可以拼接 curl
 
-            if (sb.toString().contains("ERROR")){
+//            if (sb.toString().contains("ERROR")){
+////                System.out.println(sb);
+////                return;
+//            }
+//            else {
 //                System.out.println(sb);
-//                return;
-            }
-            else {
-                System.out.println(sb);
-            }
+//            }
 
-            //System.out.println(sb);
+            System.out.println(sb);
 
             ToExcelData data = new ToExcelData();
             data.setSql(sb.toString());

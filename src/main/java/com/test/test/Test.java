@@ -1,11 +1,8 @@
 package com.test.test;
 
 import com.test.excel.ForRuleConditionMain;
-import com.test.smart.CheckTypeEnum;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Test {
@@ -20,7 +17,7 @@ public class Test {
     }
     private static String findExpressName(String logicName) {
         String temp = logicName.replace("(","").replace(")","").trim();
-        for (Map.Entry<String, String> entry : ForRuleConditionMain.PARAMETER_MAP.entrySet()) {
+        for (Map.Entry<String, String> entry : ForRuleConditionMain.DEFAULT_PARAMETER_MAP.entrySet()) {
             if (entry.getValue().equals(temp)) {
                 String key = entry.getKey();
                 return logicName.replace(temp, key);

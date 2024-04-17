@@ -161,7 +161,15 @@ public class ProcessOnToRow {
             if(StringUtils.isNotEmpty(fatherRule)){
                 fatherRule = fatherRule + " and ";
             }
-            fatherRule = fatherRule + " (" + title.substring(4) + ")";
+            String subExp = "";
+            try {
+                Integer.parseInt(title.substring(2, 3));
+                subExp = title.substring(4);
+            } catch (Exception e){
+                subExp = title.substring(3);
+            }
+
+            fatherRule = fatherRule + " (" + subExp + ")";
             if(CollectionUtils.isNotEmpty(node.getChildren())){
                 String finalFatherRule = fatherRule;
                 sortForProcessOn(node);
@@ -182,12 +190,20 @@ public class ProcessOnToRow {
             public int compare(ProcessOnNode o1, ProcessOnNode o2) {
                 int sort1 = 0;
                 if(o1.getTitle().startsWith("条件")){
-                    sort1 = Integer.parseInt(o1.getTitle().substring(4, 5));
+                    try {
+                        sort1 = Integer.parseInt(o1.getTitle().substring(2, 3));
+                    } catch (Exception e){
+                        log.info("配置错误{}", o1.getTitle());
+                    }
                 }
 
                 int sort2 = 0;
                 if(o2.getTitle().startsWith("条件")){
-                    sort2 = Integer.parseInt(o2.getTitle().substring(4, 5));
+                    try {
+                        sort2 = Integer.parseInt(o2.getTitle().substring(2, 3));
+                    } catch (Exception e){
+                        log.info("配置错误{}", o2.getTitle());
+                    }
                 }
                 return sort1-sort2;
             }

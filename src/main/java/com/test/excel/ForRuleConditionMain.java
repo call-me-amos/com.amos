@@ -35,7 +35,7 @@ public class ForRuleConditionMain {
 
     // pos脑图文件路径
     //private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
-    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414 (12).pos";
+    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414.pos";
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("============  start");
@@ -134,6 +134,10 @@ public class ForRuleConditionMain {
                 String[] tokens = part.split("not in");
                 String variableName = tokens[0].trim();
                 String valuesString = tokens[1].trim();
+                variableName = variableName.replace("（", "(");
+                variableName = variableName.replace("）", ")");
+                variableName = variableName.replace("(", "");
+
                 valuesString = valuesString.replace("（", "(");
                 valuesString = valuesString.replace("）", ")");
                 List<String> values;
@@ -154,9 +158,9 @@ public class ForRuleConditionMain {
                             .append(".contains(")
                             .append(value)
                             .append(")")
-                            .append("and");
+                            .append(" and ");
                 }
-                subMvelExpressionBuilder.delete(subMvelExpressionBuilder.length() - 3, subMvelExpressionBuilder.length());
+                subMvelExpressionBuilder.delete(subMvelExpressionBuilder.length() - 5, subMvelExpressionBuilder.length());
                 subMvelExpressionBuilder.append(")");
 
                 String newStr = fillQuote(part, subMvelExpressionBuilder);
@@ -188,9 +192,9 @@ public class ForRuleConditionMain {
                             .append(".contains(")
                             .append(value)
                             .append(")")
-                            .append("||");
+                            .append(" || ");
                 }
-                subMvelExpressionBuilder.delete(subMvelExpressionBuilder.length() - 2, subMvelExpressionBuilder.length());
+                subMvelExpressionBuilder.delete(subMvelExpressionBuilder.length() - 4, subMvelExpressionBuilder.length());
                 subMvelExpressionBuilder.append(")");
 
                 String newStr = fillQuote(part, subMvelExpressionBuilder);

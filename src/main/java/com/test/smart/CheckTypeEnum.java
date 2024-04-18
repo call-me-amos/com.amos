@@ -1,13 +1,18 @@
 package com.test.smart;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @Getter
+@Slf4j
 public enum CheckTypeEnum {
     /**
      * 默认填充编码
@@ -124,6 +129,7 @@ public enum CheckTypeEnum {
     OPENING_REMARKS_CLARITY_FOR_DECORATION_TIME("7!711!71102!59", "开场白-澄清槽位-装修时间", "7!711!71102!1"),
     OPENING_REMARKS_CLARITY_FOR_TIMEOUT("7!711!71102!69", "开场白-澄清槽位-超时促开口话术"),
 
+    /***************** start 中间态槽位 ********************/
     DEMAND_TYPE("7!711!71102!84","需求类型"),
     HOUSE_TYPE_NOT_RIGHT_TIME("7!711!71102!85","房屋类型-暂不方便沟通"),
     VALUE_POINT_HOUSE_TYPE_("7!711!71102!86","价值点-房屋类型-追问1"),
@@ -131,6 +137,42 @@ public enum CheckTypeEnum {
     COMMUNICATE_TIME("7!711!71102!88","方便沟通时间"),
     IS_TIME_COMMUNICATE("7!711!71102!89","是否方便沟通"),
     HOUSE_TYPE_NEW_CLARITY_1("7!711!71102!90","房屋类型-新房澄清问1"),
+    SLOT_FOR_RULE_01("7!711!71102!91","城市-暂不方便沟通"),
+    SLOT_FOR_RULE_02("7!711!71102!92","城市-追问1"),
+    SLOT_FOR_RULE_03("7!711!71102!93","城市-追问2"),
+    SLOT_FOR_RULE_04("7!711!71102!94","电话-追问1"),
+    SLOT_FOR_RULE_05("7!711!71102!95","电话-追问2"),
+    SLOT_FOR_RULE_06("7!711!71102!96","房屋类型_澄清槽位"),
+    SLOT_FOR_RULE_07("7!711!71102!97","房屋面积暂不方便沟通"),
+    SLOT_FOR_RULE_08("7!711!71102!98","房屋面积-追问1"),
+    SLOT_FOR_RULE_09("7!711!71102!99","房屋面积-追问2"),
+    SLOT_FOR_RULE_10("7!711!71102!100","价值点-房屋面积-追问1"),
+    SLOT_FOR_RULE_11("7!711!71102!101","交房时间-暂不方便沟通"),
+    SLOT_FOR_RULE_12("7!711!71102!102","交房时间-追问1"),
+    SLOT_FOR_RULE_13("7!711!71102!103","是否交房-暂不方便沟通"),
+    SLOT_FOR_RULE_14("7!711!71102!104","是否交房-追问1"),
+    SLOT_FOR_RULE_15("7!711!71102!105","小区地址-暂不方便沟通"),
+    SLOT_FOR_RULE_16("7!711!71102!106","小区地址-追问1"),
+    SLOT_FOR_RULE_17("7!711!71102!107","小区地址-追问2"),
+    SLOT_FOR_RULE_18("7!711!71102!108","需求类型-简装"),
+    SLOT_FOR_RULE_19("7!711!71102!109","需求类型-精装"),
+    SLOT_FOR_RULE_20("7!711!71102!110","需求类型-精装房/简装房"),
+    SLOT_FOR_RULE_21("7!711!71102!111","需求类型-暂不方便沟通"),
+    SLOT_FOR_RULE_22("7!711!71102!112","需求类型-追问1"),
+    SLOT_FOR_RULE_23("7!711!71102!113","需求信息"),
+    SLOT_FOR_RULE_24("7!711!71102!114","装修用途-暂不方便沟通"),
+    SLOT_FOR_RULE_25("7!711!71102!115","装修用途-追问1"),
+    SLOT_FOR_RULE_26("7!711!71102!116","装修用途-追问2"),
+    SLOT_FOR_RULE_27("7!711!71102!117","自建房是否交房"),
+    SLOT_FOR_RULE_28("7!711!71102!118","自建房是否交房-暂不方便沟通"),
+    SLOT_FOR_RULE_29("7!711!71102!119","自建房是否交房-追问1"),
+    SLOT_FOR_RULE_30("7!711!71102!120","自建房小区地址"),
+    SLOT_FOR_RULE_31("7!711!71102!121","自建房小区地址-暂不方便沟通"),
+    SLOT_FOR_RULE_32("7!711!71102!122","自建房小区地址-追问1"),
+    SLOT_FOR_RULE_33("7!711!71102!123","自建房小区地址-追问2"),
+    /***************** end 中间态槽位 ********************/
+
+
 
     GENDER("7!711!71102!201","性别"),
     COMPLETION("7!711!71102!202","交房类型"),
@@ -152,15 +194,23 @@ public enum CheckTypeEnum {
     VIRTUALLY_TODO_ENGINEERINGS("7!711!71102!211","待做工程项"),
     VIRTUALLY_HOUSE_TYPE("7!711!71102!213","虚拟房屋类型"),  //毛坯房，精装房，旧/二手房,, 三者取其一
 
-
-    /******************************************************* AI外呼相关槽位 **********************************************************/
-    AI_CALL_ADD_WECHAT_OPEN_REMARK("7!711!71102!79", "仅加微-开场白"),
-    AI_CALL_ADD_WECHAT_INFORM_REASON("7!711!71102!80", "仅加微-告知加微原因"),
-    AI_CALL_ADD_WECHAT_RETENTION_WORD("7!711!71102!81", "仅加微-挽留话术"),
-    AI_CALL_ADD_WECHAT_GUIDE_OPERATION("7!711!71102!82", "仅加微-引导操作加微"),
-    AI_CALL_ADD_WECHAT_INFORM_PLATFORM("7!711!71102!83", "仅加微-告知平台服务"),
-
     ;
+
+    /**
+     * 检查是否存在重复的槽位命名
+     */
+    public static void checkRepetitionMsg() {
+        Set<String> msgSet = new HashSet<>();
+        Set<String> repetitionMsg = new HashSet<>();
+        for (com.to8to.tbt.tls.smartChat.enums.CheckTypeEnum statusEnum: com.to8to.tbt.tls.smartChat.enums.CheckTypeEnum.values()) {
+            if (msgSet.contains(statusEnum.getMsg())) {
+                repetitionMsg.add(statusEnum.getMsg());
+            } else {
+                msgSet.add(statusEnum.getMsg());
+            }
+        }
+        log.info("重复的槽位： {}", JSONObject.toJSONString(repetitionMsg));
+    }
 
     /**
      * 核需槽位全码

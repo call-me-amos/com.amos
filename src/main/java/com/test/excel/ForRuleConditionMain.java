@@ -53,11 +53,11 @@ public class ForRuleConditionMain {
         ProcessOnToRow.initExcelModelFromProcessOn();
         List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
+        System.out.println(JSONObject.toJSONString(NO_CONFIG_NAME));
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         createRobotAsk(robotAskMap);
 
-        System.out.println(JSONObject.toJSONString(NO_CONFIG_NAME));
         System.out.println("===============");
     }
 

@@ -57,7 +57,7 @@ public class ForRuleConditionMain {
         ProcessOnToRow.initExcelModelFromProcessOn();
         List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
-        System.out.println(JSONObject.toJSONString(NO_CONFIG_NAME));
+        System.out.println("没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         createRobotAsk(robotAskMap);
@@ -91,7 +91,7 @@ public class ForRuleConditionMain {
             result = RobotAskManager.createOrUpdateRobotAskId(robotAskId, checkTypeCode, replyList, defaultReplyList, noResponseList);
             if(null == robotAskId){
                 robotAskId = result.getInteger("data");
-                System.out.println("新增话术id=" + robotAskId);
+                //System.out.println("新增话术id=" + robotAskId);
                 RobotAskManager.effectOrInvalid(1, Arrays.asList(robotAskId));
             }
         });
@@ -164,9 +164,6 @@ public class ForRuleConditionMain {
     private static void dealSingleExpression(StringBuilder mvelExpressionBuilder, String[] parts, String operate) {
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
-            if (part.contains("意图=表达房子出租中")) {
-                System.out.print("");
-            }
             if (part.contains(" or ")) {
                 String[] tokens = part.split(" or ");
                 dealSingleExpression(mvelExpressionBuilder, tokens, " || ");

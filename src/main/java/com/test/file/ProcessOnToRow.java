@@ -40,9 +40,9 @@ public class ProcessOnToRow {
     private static String skipSlot = "";
 
     public static void main(String[] args) {
-        initExcelModelFromProcessOn();
-        System.out.println(JSONObject.toJSONString(EXCEL_MODEL_FROM_PROCESS_ON));
-        System.out.println(JSONObject.toJSONString(ROBOT_ASK_LIST));
+//        initExcelModelFromProcessOn();
+//        System.out.println(JSONObject.toJSONString(EXCEL_MODEL_FROM_PROCESS_ON));
+//        System.out.println(JSONObject.toJSONString(ROBOT_ASK_LIST));
     }
 
     public static void initExcelModelFromProcessOn(){
@@ -77,7 +77,7 @@ public class ProcessOnToRow {
             } else if(secondNode.getTitle().startsWith("姓氏")){
                 skipSlot = "姓氏";
             } else {
-                log.info("其他槽位，暂时不处理, secondNode={}", JSONObject.toJSONString(secondNode));
+                //log.info("其他槽位，暂时不处理, secondNode={}", JSONObject.toJSONString(secondNode));
                 return;
             }
 
@@ -326,9 +326,6 @@ public class ProcessOnToRow {
             }
 
             if (!robotAsk.isEmpty()){
-                if("/".equals(nextAskSlot)){
-                    System.out.println("===========");
-                }
                 ROBOT_ASK_LIST.put(nextAskSlot, robotAsk);
             }
         }

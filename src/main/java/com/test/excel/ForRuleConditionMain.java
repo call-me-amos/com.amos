@@ -45,6 +45,10 @@ public class ForRuleConditionMain {
      * 没有配置的槽位
      */
     private static final Set<String> NO_CONFIG_NAME = Sets.newHashSet();
+    /**
+     * 没有配置的槽位
+     */
+    private static final Set<String> NO_CONFIG_NAME_FOR_ROBOT_ASK = Sets.newHashSet();
 
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("============  start");
@@ -57,6 +61,7 @@ public class ForRuleConditionMain {
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         createRobotAsk(robotAskMap);
+        System.out.println("ERROR， 生成话术的时候，没有配置该槽位：" + JSONObject.toJSONString(NO_CONFIG_NAME_FOR_ROBOT_ASK));
 
         System.out.println("===============");
     }
@@ -67,6 +72,10 @@ public class ForRuleConditionMain {
             List<JSONObject> defaultReplyList = null == paraMap.get("defaultReplyList")? Lists.newArrayList(): paraMap.get("defaultReplyList");
             List<JSONObject> noResponseList = null == paraMap.get("noResponseList")? Lists.newArrayList():paraMap.get("noResponseList");
 
+            if(null == CheckTypeEnum.getByName(checkTypeCodeName)){
+                NO_CONFIG_NAME_FOR_ROBOT_ASK.add(checkTypeCodeName);
+                return;
+            }
             String checkTypeCode = CheckTypeEnum.getByName(checkTypeCodeName).getCode();
             JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
 

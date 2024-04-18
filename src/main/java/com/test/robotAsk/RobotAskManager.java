@@ -36,7 +36,6 @@ public class RobotAskManager {
                                                       List<JSONObject> defaultReplyList,
                                                       List<JSONObject> noResponseList){
         String url = url_pre + "tls/smartChatRobotAsk/createOrUpdate" + ticket;
-
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("relateTemplateId", templateId);
         paramMap.put("id", robotAskId);

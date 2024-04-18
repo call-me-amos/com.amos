@@ -144,8 +144,10 @@ public class ProcessOnToRow {
             nextStrategyType = nextStrategyType.replace("回复QA+","");
 
             String nextAskSlot = "/";
-            if(nextStrategyType.contains("下一槽位") || nextStrategyType.contains("转人工")
-                    || nextStrategyType.contains("闭环") || nextStrategyType.contains("/")){
+            if("下一槽位".equals(nextStrategyType)
+                    || "转人工".equals(nextStrategyType)
+                    || "闭环".equals(nextStrategyType)
+                    || "/".equals(nextStrategyType)){
             }else{
                 nextAskSlot = nextStrategyType;
                 nextStrategyType = "指定跳转";
@@ -257,7 +259,8 @@ public class ProcessOnToRow {
                 sortForRobotAskProcessOn(node);
                 node.getChildren().forEach(subNode->{
                     JSONObject reply = new JSONObject();
-                    reply.put("delayTime", subNode.getTitle().split("=")[1]);
+                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>","");
+                    reply.put("delayTime", delayTime);
                     if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("话术内容：", "");
@@ -278,7 +281,8 @@ public class ProcessOnToRow {
                 sortForRobotAskProcessOn(node);
                 node.getChildren().forEach(subNode->{
                     JSONObject reply = new JSONObject();
-                    reply.put("delayTime", subNode.getTitle().split("=")[1]);
+                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>","");
+                    reply.put("delayTime", delayTime);
                     if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("话术内容：", "");
@@ -322,6 +326,9 @@ public class ProcessOnToRow {
             }
 
             if (!robotAsk.isEmpty()){
+                if("/".equals(nextAskSlot)){
+                    System.out.println("===========");
+                }
                 ROBOT_ASK_LIST.put(nextAskSlot, robotAsk);
             }
         }

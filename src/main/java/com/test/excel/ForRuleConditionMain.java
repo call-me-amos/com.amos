@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.test.file.ProcessOnToRow;
+import com.test.robotAsk.RobotAskManager;
 import com.test.smart.CheckTypeEnum;
 import io.netty.util.internal.ThrowableUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -27,11 +30,12 @@ import java.util.*;
 @Slf4j
 public class ForRuleConditionMain {
     // pos脑图文件路径
-    public static final String filePath = "C:\\Users\\amos.tong\\Desktop\\新策略表格式-0414.pos";
+    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略表格式-0414.pos";
     // private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
 
-    private static final String FROM_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\智能应答策略2.0-7.xlsx";
-    private static final String TO_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\temp.xlsx";
+//    private static final String FROM_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\智能应答策略2.0-7.xlsx";
+//    private static final String TO_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\temp.xlsx";
+
 
     /**
      * 变量的默认值
@@ -46,11 +50,42 @@ public class ForRuleConditionMain {
         System.out.println("============  start");
         // File file = new File(FROM_FILE_NAME);
         // List<LinkedHashMap<Integer, String>> excelModelFromFileList = importExcel(new FileInputStream(file), 0);
-        List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.getExcelModelFromProcessOn();
+        ProcessOnToRow.initExcelModelFromProcessOn();
+        List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
+
+        Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
+        createRobotAsk(robotAskMap);
 
         System.out.println(JSONObject.toJSONString(NO_CONFIG_NAME));
         System.out.println("===============");
+    }
+
+    private static void createRobotAsk(Map<String, Map<String, List<JSONObject>>> robotAskMap){
+        robotAskMap.forEach((checkTypeCodeName, paraMap)->{
+            List<JSONObject> replyList = null == paraMap.get("replyList")? Lists.newArrayList():paraMap.get("replyList");
+            List<JSONObject> defaultReplyList = null == paraMap.get("defaultReplyList")? Lists.newArrayList(): paraMap.get("defaultReplyList");
+            List<JSONObject> noResponseList = null == paraMap.get("noResponseList")? Lists.newArrayList():paraMap.get("noResponseList");
+
+            String checkTypeCode = CheckTypeEnum.getByName(checkTypeCodeName).getCode();
+            JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
+
+            Integer robotAskId = null;
+            if(null != result.getJSONObject("data") && null != result.getJSONObject("data").getInteger("id")){
+                robotAskId = result.getJSONObject("data").getInteger("id");
+
+                int finalRobotAskId = robotAskId;
+                defaultReplyList.forEach(defaultReply->{
+                    defaultReply.put("robotAskId", finalRobotAskId);
+                });
+            }
+            result = RobotAskManager.createOrUpdateRobotAskId(robotAskId, checkTypeCode, replyList, defaultReplyList, noResponseList);
+            if(null == robotAskId){
+                robotAskId = result.getInteger("data");
+                System.out.println("新增话术id=" + robotAskId);
+                RobotAskManager.effectOrInvalid(1, Arrays.asList(robotAskId));
+            }
+        });
     }
 
     /**

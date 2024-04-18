@@ -50,27 +50,45 @@ public class ProcessOnToRow {
         JSONArray childrenArray = jsonObject.getJSONObject("diagram").getJSONObject("elements").getJSONArray("children");
         childrenArray.forEach(o -> {
             ProcessOnNode secondNode = JSONObject.parseObject(String.valueOf(o), ProcessOnNode.class);
-            if(secondNode.getTitle().startsWith("公共策略")
-                    || secondNode.getTitle().startsWith("开场白")
-                    || secondNode.getTitle().startsWith("房屋类型")){
-                if(secondNode.getTitle().startsWith("开场白")){
-                    skipSlot = "开场白-澄清槽位";
-                } else if(secondNode.getTitle().startsWith("房屋类型")){
-                    skipSlot = "房屋类型";
-                } else {
-                    skipSlot = "";
-                }
-
-                if(CollectionUtils.isNotEmpty(secondNode.getChildren())){
-                    String finalFatherRule1 = "";
-                    sortForConditionProcessOn(secondNode);
-                    secondNode.getChildren().forEach(children->{
-                        parseNode(children, finalFatherRule1);
-                    });
-                }
+            if(secondNode.getTitle().startsWith("公共策略")){
+                skipSlot = "";
+            } else if(secondNode.getTitle().startsWith("开场白")){
+                skipSlot = "开场白-澄清槽位";
+            } else if(secondNode.getTitle().startsWith("装修时间（初轮）")){
+                skipSlot = "装修时间";
+            } else if(secondNode.getTitle().startsWith("房屋类型")){
+                skipSlot = "房屋类型";
+            } else if(secondNode.getTitle().startsWith("需求类型（装修/定制）")){
+                skipSlot = "需求类型";
+            } else if(secondNode.getTitle().startsWith("装修用途")){
+                skipSlot = "装修用途";
+            } else if(secondNode.getTitle().startsWith("城市")){
+                skipSlot = "城市";
+            } else if(secondNode.getTitle().startsWith("是否交房")){
+                skipSlot = "是否交房";
+            } else if(secondNode.getTitle().startsWith("交房时间")){
+                skipSlot = "交房时间";
+            } else if(secondNode.getTitle().startsWith("小区地址")){
+                skipSlot = "小区地址";
+            } else if(secondNode.getTitle().startsWith("房屋面积")){
+                skipSlot = "房屋类型";
+            } else if(secondNode.getTitle().startsWith("电话")){
+                skipSlot = "电话";
+            } else if(secondNode.getTitle().startsWith("姓氏")){
+                skipSlot = "姓氏";
             } else {
-                //log.info("其他槽位，暂时不处理, secondNode={}", JSONObject.toJSONString(secondNode));
+                log.info("其他槽位，暂时不处理, secondNode={}", JSONObject.toJSONString(secondNode));
+                return;
             }
+
+            if(CollectionUtils.isNotEmpty(secondNode.getChildren())){
+                String finalFatherRule1 = "";
+                sortForConditionProcessOn(secondNode);
+                secondNode.getChildren().forEach(children->{
+                    parseNode(children, finalFatherRule1);
+                });
+            }
+
         });
 
 //        excelModelFromProcessOn.forEach(e->{

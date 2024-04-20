@@ -58,8 +58,8 @@ public class ProcessOnToRow {
                 skipSlot = "装修时间-初轮";
             } else if(secondNode.getTitle().startsWith("房屋类型")){
                 skipSlot = "房屋类型";
-            } else if(secondNode.getTitle().startsWith("需求类型-装修/定制")){
-                skipSlot = "需求类型-装修/定制";
+//            } else if(secondNode.getTitle().startsWith("需求类型-装修/定制")){
+//                skipSlot = "需求类型-装修/定制";
             } else if(secondNode.getTitle().startsWith("工程量")){
                 skipSlot = "工程量";
             } else if(secondNode.getTitle().startsWith("装修用途")){
@@ -72,9 +72,11 @@ public class ProcessOnToRow {
                 skipSlot = "交房时间";
             } else if(secondNode.getTitle().startsWith("房子交房前能否提前进去看")){
                 skipSlot = "房子交房前能否提前进去看";
+            } else if(secondNode.getTitle().startsWith("量房时间")){
+                skipSlot = "量房时间";
             } else if(secondNode.getTitle().startsWith("小区地址")){
                 skipSlot = "小区地址";
-            } else if(secondNode.getTitle().startsWith("房屋面积")){
+            }else if(secondNode.getTitle().startsWith("房屋面积")){
                 skipSlot = "房屋面积";
             } else if(secondNode.getTitle().startsWith("装修时间-引导")){
                 skipSlot = "装修时间-引导";
@@ -130,6 +132,8 @@ public class ProcessOnToRow {
 
     public static void parseNode(ProcessOnNode node, StringBuilder fatherRule){
         String title = node.getTitle();
+        title = title.replaceAll("（", "(");
+        title = title.replaceAll("）", ")");
         title = title.replace("&nbsp;", " ");
         title = title.replace("<br>", " ");
         title = title.trim();

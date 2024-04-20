@@ -36,6 +36,11 @@ public class ForRuleConditionMain {
 //    private static final String FROM_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\智能应答策略2.0-7.xlsx";
 //    private static final String TO_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\temp.xlsx";
 
+    /**
+     * 模板id
+     */
+    private static final int TEMPLATE_ID = 60; // 志威
+//    private static final int TEMPLATE_ID = 64; // 志新
 
     /**
      * 变量的默认值
@@ -133,7 +138,7 @@ public class ForRuleConditionMain {
             sb.append("\",\"");
             sb.append(row.get(3));
             sb.append("\",\"");
-            sb.append(60);
+            sb.append(ForRuleConditionMain.TEMPLATE_ID);
             sb.append("\"),");
             // TODO 话术可以拼接 curl
 
@@ -284,17 +289,36 @@ public class ForRuleConditionMain {
                 String[] tokens = part.split("小于");
                 String variableName = tokens[0].trim();
                 String value = tokens[1].trim();
+                value = value.replace("槽位-当天日期", "currentDate");
+                mvelExpressionBuilder.append(findExpressName(variableName)).append(" < ").append(value);
+            } else if (part.contains("&lt;")) {
+                String[] tokens = part.split("&lt;");
+                String variableName = tokens[0].trim();
+                String value = tokens[1].trim();
+                value = value.replace("槽位-当天日期", "currentDate");
                 mvelExpressionBuilder.append(findExpressName(variableName)).append(" < ").append(value);
             } else if (part.contains("大于")) {
                 String[] tokens = part.split("大于");
                 String variableName = tokens[0].trim();
                 String value = tokens[1].trim();
+                value = value.replace("槽位-当天日期", "currentDate");
+                mvelExpressionBuilder.append(findExpressName(variableName)).append(" > ").append(value);
+            } else if (part.contains("&gt;")) {
+                String[] tokens = part.split("&gt;");
+                String variableName = tokens[0].trim();
+                String value = tokens[1].trim();
+                value = value.replace("槽位-当天日期", "currentDate");
                 mvelExpressionBuilder.append(findExpressName(variableName)).append(" > ").append(value);
             } else if (part.contains("≥")) {
                 String[] tokens = part.split("≥");
                 String variableName = tokens[0].trim();
                 String value = tokens[1].trim();
                 mvelExpressionBuilder.append(findExpressName(variableName)).append(" >= ").append(value);
+            } else if (part.contains("≤")) {
+                String[] tokens = part.split("≤");
+                String variableName = tokens[0].trim();
+                String value = tokens[1].trim();
+                mvelExpressionBuilder.append(findExpressName(variableName)).append(" <= ").append(value);
             } else if (part.contains("＞")) {
                 String[] tokens = part.split("＞");
                 String variableName = tokens[0].trim();
@@ -371,7 +395,10 @@ public class ForRuleConditionMain {
         }
         if (expressName.endsWith("_VALUE")
                 || Arrays.asList("currentIntention", "currentIntentionList", "currentAskSlot", "skipSlot",
-                "(currentIntention", "(currentIntentionList", "(currentAskSlot", "(skipSlot").contains(expressName)) {
+                "currentTimeHour","currentTimeWeek","remainingDays",
+                "(currentIntention", "(currentIntentionList", "(currentAskSlot", "(skipSlot",
+                "(currentTimeHour","(currentTimeWeek","(remainingDays"
+        ).contains(expressName)) {
             value = getStringWithSingleQuotationMark(value);
         }
         return value;
@@ -384,12 +411,12 @@ public class ForRuleConditionMain {
         return value;
     }
 
-    private static String getStringWithNoQuotationMark(String value) {
-        String temp = value.replace("(", "").replace(")", "");
-        String newTemp = "" + temp + "";
-        value = value.replace(temp, newTemp);
-        return value;
-    }
+//    private static String getStringWithNoQuotationMark(String value) {
+//        String temp = value.replace("(", "").replace(")", "");
+//        String newTemp = "" + temp + "";
+//        value = value.replace(temp, newTemp);
+//        return value;
+//    }
 
     private static String findExpressName(String logicName) {
         String temp = logicName.replaceAll("\\(", "").replaceAll("\\)", "").trim();
@@ -399,6 +426,13 @@ public class ForRuleConditionMain {
                 String key = entry.getKey();
                 return logicName.replace(temp, key);
             }
+        }
+
+        if(logicName.contains(" - ")){
+            String[] subLogicName = logicName.split(" - ");
+            String subExpress1 = findExpressName(subLogicName[0]);
+            String subExpress2 = findExpressName(subLogicName[1]);
+            return subExpress1 + " - " + subExpress2;
         }
         NO_CONFIG_NAME.add(logicName);
         return "ERROR： " + logicName;
@@ -410,6 +444,11 @@ public class ForRuleConditionMain {
         map.put("currentIntentionList", "多意图");
         map.put("currentAskSlot", "当前询问槽位");
         map.put("skipSlot", "跳过槽位");
+
+        map.put("currentTimeHour", "槽位-当天时间-小时");
+        map.put("currentTimeWeek", "槽位-当天时间-星期");
+        map.put("remainingDays", "槽位-当月剩余天数");
+        map.put("currentDate", "槽位-当天日期");
         for (CheckTypeEnum e : CheckTypeEnum.values()) {
             map.put(e + "_VALUE", "槽位-" + e.getMsg());
             map.put(e + "_TIMES", e.getMsg() + "-询问次数");

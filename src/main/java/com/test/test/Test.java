@@ -60,25 +60,25 @@ public class Test {
         return sb.toString();
     }
 
-    private static String getStringWithSingleQuotationMark(String value, String expressName) {
-        if (expressName.endsWith("_VALUE")
-                || Arrays.asList("currentIntention", "currentIntentionList", "currentAskSlot", "skipSlot",
-                "(currentIntention", "(currentIntentionList", "(currentAskSlot","(skipSlot").contains(expressName)) {
-            value= getStringWithSingleQuotationMark(value);
-        }
-        return value;
-    }
-    private static String getStringWithSingleQuotationMark(String value) {
-        String temp = value.replace("(", "").replace(")", "");
-        String newTemp = "'" + temp + "'";
-        value = value.replace(temp, newTemp);
-        return value;
-    }
-
-    private static String getStringWithNoQuotationMark(String value) {
-        String temp = value.replace("(", "").replace(")", "");
-        String newTemp = "" + temp + "";
-        value = value.replace(temp, newTemp);
-        return value;
-    }
+//    private static String getStringWithSingleQuotationMark(String value, String expressName) {
+//        if (expressName.endsWith("_VALUE")
+//                || Arrays.asList("currentIntention", "currentIntentionList", "currentAskSlot", "skipSlot",
+//                "(currentIntention", "(currentIntentionList", "(currentAskSlot","(skipSlot").contains(expressName)) {
+//            value= getStringWithSingleQuotationMark(value);
+//        }
+//        return value;
+//    }
+//    private static String getStringWithSingleQuotationMark(String value) {
+//        String temp = value.replace("(", "").replace(")", "");
+//        String newTemp = "'" + temp + "'";
+//        value = value.replace(temp, newTemp);
+//        return value;
+//    }
+//
+//    private static String getStringWithNoQuotationMark(String value) {
+//        String temp = value.replace("(", "").replace(")", "");
+//        String newTemp = "" + temp + "";
+//        value = value.replace(temp, newTemp);
+//        return value;
+//    }
 }

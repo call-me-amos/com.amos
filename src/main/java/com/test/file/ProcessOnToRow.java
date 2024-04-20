@@ -54,12 +54,14 @@ public class ProcessOnToRow {
                 skipSlot = "";
             } else if(secondNode.getTitle().startsWith("开场白")){
                 skipSlot = "开场白-澄清槽位";
-            } else if(secondNode.getTitle().startsWith("装修时间（初轮）")){
-                skipSlot = "装修时间";
+            } else if(secondNode.getTitle().startsWith("装修时间-初轮")){
+                skipSlot = "装修时间-初轮";
             } else if(secondNode.getTitle().startsWith("房屋类型")){
                 skipSlot = "房屋类型";
-            } else if(secondNode.getTitle().startsWith("需求类型（装修/定制）")){
-                skipSlot = "需求类型";
+            } else if(secondNode.getTitle().startsWith("需求类型-装修/定制")){
+                skipSlot = "需求类型-装修/定制";
+            } else if(secondNode.getTitle().startsWith("工程量")){
+                skipSlot = "工程量";
             } else if(secondNode.getTitle().startsWith("装修用途")){
                 skipSlot = "装修用途";
             } else if(secondNode.getTitle().startsWith("城市")){
@@ -68,10 +70,14 @@ public class ProcessOnToRow {
                 skipSlot = "是否交房";
             } else if(secondNode.getTitle().startsWith("交房时间")){
                 skipSlot = "交房时间";
+            } else if(secondNode.getTitle().startsWith("房子交房前能否提前进去看")){
+                skipSlot = "房子交房前能否提前进去看";
             } else if(secondNode.getTitle().startsWith("小区地址")){
                 skipSlot = "小区地址";
             } else if(secondNode.getTitle().startsWith("房屋面积")){
-                skipSlot = "房屋类型";
+                skipSlot = "房屋面积";
+            } else if(secondNode.getTitle().startsWith("装修时间-引导")){
+                skipSlot = "装修时间-引导";
             } else if(secondNode.getTitle().startsWith("电话")){
                 skipSlot = "电话";
             } else if(secondNode.getTitle().startsWith("姓氏")){
@@ -82,9 +88,9 @@ public class ProcessOnToRow {
             }
 
             if(CollectionUtils.isNotEmpty(secondNode.getChildren())){
-                String finalFatherRule1 = "";
                 sortForConditionProcessOn(secondNode);
                 secondNode.getChildren().forEach(children->{
+                    StringBuilder finalFatherRule1 = new StringBuilder();
                     parseNode(children, finalFatherRule1);
                 });
             }
@@ -122,19 +128,16 @@ public class ProcessOnToRow {
         }
     }
 
-    public static void parseNode(ProcessOnNode node, String fatherRule){
+    public static void parseNode(ProcessOnNode node, StringBuilder fatherRule){
         String title = node.getTitle();
         title = title.replace("&nbsp;", " ");
         title = title.replace("<br>", " ");
         title = title.trim();
         if(title.startsWith("备注") || title.startsWith("回复")){
-//            if(title.startsWith("回复")){
-//                System.out.println("xxx");
-//            }
             if(CollectionUtils.isNotEmpty(node.getChildren())){
-                String finalFatherRule1 = fatherRule;
                 sortForConditionProcessOn(node);
                 node.getChildren().forEach(children->{
+                    StringBuilder finalFatherRule1 = new StringBuilder(fatherRule);
                     parseNode(children, finalFatherRule1);
                 });
             }
@@ -153,7 +156,7 @@ public class ProcessOnToRow {
                 nextStrategyType = "指定跳转";
             }
 
-            String ruleCondition = StringUtils.isEmpty(skipSlot)? fatherRule: "(跳过槽位 <> " + skipSlot + ") and "+fatherRule;
+            String ruleCondition = StringUtils.isEmpty(skipSlot)? fatherRule.toString(): "(跳过槽位 <> " + skipSlot + ") and "+ fatherRule;
             // 新增一个叶子结点：规则名称	规则条件	跳转策略	跳转槽位    核需话术    超时话术
             LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
             int index = RULE_INDEX.incrementAndGet();
@@ -172,26 +175,26 @@ public class ProcessOnToRow {
 
                 sortForConditionProcessOn(node);
                 node.getChildren().forEach(childrenNode ->{
-                    parseNode(childrenNode, "");
+                    StringBuilder finalFatherRule = new StringBuilder();
+                    parseNode(childrenNode, finalFatherRule);
                 });
             }
         } else if(title.startsWith("条件")){
-            if(StringUtils.isNotEmpty(fatherRule)){
-                fatherRule = fatherRule + " and ";
+            if(StringUtils.isNotEmpty(fatherRule.toString())){
+                fatherRule.append(" and ");
             }
             String subExp = "";
             try {
-                Integer.parseInt(title.substring(2, 3));
-                subExp = title.substring(4);
+                String sub = title.replace(":", "：");
+                subExp = sub.substring(sub.indexOf("：") + 1);
             } catch (Exception e){
-                subExp = title.substring(3);
+                subExp = title;
             }
-
-            fatherRule = fatherRule + " (" + subExp + ")";
+            fatherRule.append(" (" + subExp + ")");
             if(CollectionUtils.isNotEmpty(node.getChildren())){
-                String finalFatherRule = fatherRule;
                 sortForConditionProcessOn(node);
                 node.getChildren().forEach(children->{
+                    StringBuilder finalFatherRule = new StringBuilder(fatherRule);
                     parseNode(children, finalFatherRule);
                 });
             } else {
@@ -232,7 +235,8 @@ public class ProcessOnToRow {
             int sort1 = 0;
             if(o1.getTitle().startsWith("条件")){
                 try {
-                    sort1 = Integer.parseInt(o1.getTitle().substring(2, 3));
+                    String sub = o1.getTitle().replace(":", "：");
+                    sort1 = Integer.parseInt(sub.substring(2, sub.indexOf("：")));
                 } catch (Exception e){
                     log.info("配置错误{}", o1.getTitle());
                 }
@@ -241,7 +245,8 @@ public class ProcessOnToRow {
             int sort2 = 0;
             if(o2.getTitle().startsWith("条件")){
                 try {
-                    sort2 = Integer.parseInt(o2.getTitle().substring(2, 3));
+                    String sub = o2.getTitle().replace(":", "：");
+                    sort2 = Integer.parseInt(sub.substring(2, sub.indexOf("：")));
                 } catch (Exception e){
                     log.info("配置错误{}", o2.getTitle());
                 }

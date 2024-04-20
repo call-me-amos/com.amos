@@ -57,7 +57,7 @@ public class ForRuleConditionMain {
         ProcessOnToRow.initExcelModelFromProcessOn();
         List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
-        System.out.println("没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
+        System.out.println("ERROR 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         createRobotAsk(robotAskMap);
@@ -271,6 +271,15 @@ public class ForRuleConditionMain {
                 value = getStringWithSingleQuotationMark(value, expressName);
 
                 mvelExpressionBuilder.append(expressName).append(" != ").append(value);
+            } else if (part.contains("&lt;&gt;")) {
+                String[] tokens = part.split("&lt;&gt;");
+                String variableName = tokens[0].trim();
+                String value = tokens[1].trim();
+
+                String expressName = findExpressName(variableName);
+                value = getStringWithSingleQuotationMark(value, expressName);
+
+                mvelExpressionBuilder.append(expressName).append(" != ").append(value);
             } else if (part.contains("小于")) {
                 String[] tokens = part.split("小于");
                 String variableName = tokens[0].trim();
@@ -383,7 +392,8 @@ public class ForRuleConditionMain {
     }
 
     private static String findExpressName(String logicName) {
-        String temp = logicName.replace("(", "").replace(")", "").trim();
+        String temp = logicName.replaceAll("\\(", "").replaceAll("\\)", "").trim();
+        temp = temp.replaceAll("（", "").replaceAll("）", "").trim();
         for (Map.Entry<String, String> entry : DEFAULT_PARAMETER_MAP.entrySet()) {
             if (entry.getValue().equals(temp)) {
                 String key = entry.getKey();

@@ -39,8 +39,9 @@ public class ForRuleConditionMain {
     /**
      * 固定模板id
      */
-    //       public static final int TEMPLATE_ID = 60; // 志威
-    public static final int TEMPLATE_ID = 64; // 志新
+    public static final int TEMPLATE_ID = 47;
+     //public static final int TEMPLATE_ID = 60; // 志威
+    //       public static final int TEMPLATE_ID = 64; // 志新
 
     /**
      * 变量的默认值
@@ -90,8 +91,8 @@ public class ForRuleConditionMain {
             JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
 
             Integer robotAskId = null;
-            if(null != result.getJSONObject("data") && null != result.getJSONObject("data").getInteger("id")){
-                robotAskId = result.getJSONObject("data").getInteger("id");
+            if(null != result.getJSONObject("result") && null != result.getJSONObject("result").getInteger("id")){
+                robotAskId = result.getJSONObject("result").getInteger("id");
 
                 int finalRobotAskId = robotAskId;
                 defaultReplyList.forEach(defaultReply->{
@@ -100,7 +101,7 @@ public class ForRuleConditionMain {
             }
             result = RobotAskManager.createOrUpdateRobotAskId(robotAskId, checkTypeCode, replyList, defaultReplyList, noResponseList);
             if(null == robotAskId){
-                robotAskId = result.getInteger("data");
+                robotAskId = result.getInteger("result");
                 //System.out.println("新增话术id=" + robotAskId);
                 RobotAskManager.effectOrInvalid(1, Arrays.asList(robotAskId));
             }

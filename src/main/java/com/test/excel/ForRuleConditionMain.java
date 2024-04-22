@@ -37,10 +37,10 @@ public class ForRuleConditionMain {
 //    private static final String TO_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\temp.xlsx";
 
     /**
-     * 模板id
+     * 固定模板id
      */
-    private static final int TEMPLATE_ID = 60; // 志威
-//    private static final int TEMPLATE_ID = 64; // 志新
+    public static final int TEMPLATE_ID = 60; // 志威
+    //      public static final int TEMPLATE_ID = 64; // 志新
 
     /**
      * 变量的默认值

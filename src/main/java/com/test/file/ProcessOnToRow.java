@@ -74,7 +74,7 @@ public class ProcessOnToRow {
                 skipSlot = "房子交房前能否提前进去看";
             } else if(secondNode.getTitle().startsWith("意向量房时间")){
                 skipSlot = "意向量房时间";
-            } else if(secondNode.getTitle().startsWith("小区地址")){
+            } else if(secondNode.getTitle().startsWith("小区名称")){
                 skipSlot = "小区名称";
             }else if(secondNode.getTitle().startsWith("房屋面积")){
                 skipSlot = "房屋面积";
@@ -323,7 +323,7 @@ public class ProcessOnToRow {
                 String str1 = node.getChildren().get(0).getTitle();
                 if(str1.contains("肯定回答")){
                     String str2 = node.getChildren().get(0).getChildren().get(0).getTitle();
-                    String value = str2.split("=")[1];
+                    String value = str2.replace("赋值：", "").trim().replace("<br>", "").trim();
                     JSONObject defaultReply = new JSONObject();
                     defaultReply.put("affNegIntentionName", "肯定回答");
                     defaultReply.put("content", value.trim());

@@ -2,6 +2,7 @@ package com.test.robotAsk;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.test.excel.ForRuleConditionMain;
 import com.test.http.HttpUtils;
 import org.apache.http.entity.ContentType;
 
@@ -10,10 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RobotAskManager {
-    /**
-     * 固定模板id
-     */
-    private static final String templateId = "60";
     private static final String ticket = "";
 //            "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
 //            ;
@@ -24,7 +21,7 @@ public class RobotAskManager {
     public static JSONObject queryContentByChatIdAndCheckTypeCode(String checkTypeCode){
         String url = url_pre + "tls/smartChat/oms/findByTemplateIdAndCheckTypeCode" + ticket;
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("templateId", templateId);
+        paramMap.put("templateId", ForRuleConditionMain.TEMPLATE_ID);
         paramMap.put("askSlot", checkTypeCode);
         JSONObject httpResult = httpUtils.sendPostRequest(url, paramMap,
                 new HashMap<>(), new TypeReference<JSONObject>() {}, ContentType.APPLICATION_JSON);
@@ -37,7 +34,7 @@ public class RobotAskManager {
                                                       List<JSONObject> noResponseList){
         String url = url_pre + "tls/smartChatRobotAsk/createOrUpdate" + ticket;
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("relateTemplateId", templateId);
+        paramMap.put("relateTemplateId", ForRuleConditionMain.TEMPLATE_ID);
         paramMap.put("id", robotAskId);
         paramMap.put("checkTypeCode", checkTypeCode);
         paramMap.put("type", 0);

@@ -39,9 +39,16 @@ public class ForRuleConditionMain {
     /**
      * 固定模板id
      */
-    public static final int TEMPLATE_ID = 47;
-     //public static final int TEMPLATE_ID = 60; // 志威
+    //public static final int TEMPLATE_ID = 47;
+     public static final int TEMPLATE_ID = 60; // 志威
     //       public static final int TEMPLATE_ID = 64; // 志新
+
+    public static final String ticket = //"";
+            "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
+            ;
+    //public static final String url_pre = "http://10.4.42.48:40121/";
+    public static final String url_pre = "https://test-apigw.to8to.com/cgi/";
+    //public static final String url_pre = "https://apigw.to8to.com/cgi/";
 
     /**
      * 变量的默认值

@@ -31,6 +31,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -183,7 +186,7 @@ public class HttpUtils {
         return getPostResult(httpClient, httpPost, url);
     }
 
-    private void assembleJson(Map<String, Object> paramMap, HttpPost httpPost) {
+    private void assembleJson(Map<String, Object> paramMap, HttpPost httpPost) throws UnsupportedEncodingException {
         JSONObject jsonParam = new JSONObject();
         Iterator<Map.Entry<String, Object>> iterator = paramMap.entrySet().iterator();
         while (iterator.hasNext()) {
@@ -191,7 +194,8 @@ public class HttpUtils {
             jsonParam.put(mapEntry.getKey(), mapEntry.getValue());
         }
         String string = jsonParam.toString();
-        StringEntity entity = new StringEntity(string, ContentType.APPLICATION_JSON);
+        String encodeString = URLEncoder.encode(string, "UTF-8");
+        StringEntity entity = new StringEntity(encodeString, ContentType.APPLICATION_JSON);
 
         // 为httpPost设置封装好的请求参数
         httpPost.setEntity(entity);

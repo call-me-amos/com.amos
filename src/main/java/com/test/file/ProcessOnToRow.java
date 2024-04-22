@@ -266,13 +266,19 @@ public class ProcessOnToRow {
                     if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("话术内容：", "")
+                                .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
+
+                        if(content.contains("现场量房先帮您延期预约到")){
+                            System.out.println("=====");
+                        }
                         reply.put("content", content);
                         reply.put("type", 0);
                         replyList.add(reply);
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("素材ID")){
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("素材ID：", "")
+                                .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 3);
@@ -290,6 +296,7 @@ public class ProcessOnToRow {
                     if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("话术内容：", "")
+                                .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 0);
@@ -297,6 +304,7 @@ public class ProcessOnToRow {
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("素材ID")){
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("素材ID：", "")
+                                .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 3);
@@ -304,13 +312,13 @@ public class ProcessOnToRow {
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("子槽位")){
                         String subCheckTypeCode = subNode.getChildren().get(0).getTitle()
                                 .replace("子槽位：", "")
-                                .replace("&nbsp;", "").trim()
+                                .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("subCheckTypeCode", CheckTypeEnum.getByName(subCheckTypeCode).getCode());
                         String content = subNode.getChildren().get(0)
                                 .getChildren().get(0).getTitle()
                                 .replace("话术内容：", "")
-                                .replace("&nbsp;", "").trim()
+                                .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 5);
@@ -328,7 +336,7 @@ public class ProcessOnToRow {
                     String str2 = node.getChildren().get(0).getChildren().get(0).getTitle();
                     String value = str2.replace("赋值：", "").trim()
                             .replace("赋值:", "").trim()
-                            .replace("&nbsp;", "").trim()
+                            .replaceAll("&nbsp;", "").trim()
                             .replace("<br>", "").trim();
                     JSONObject defaultReply = new JSONObject();
                     defaultReply.put("affNegIntentionName", "肯定回答");

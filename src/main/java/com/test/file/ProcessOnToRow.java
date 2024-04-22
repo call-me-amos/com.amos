@@ -323,7 +323,9 @@ public class ProcessOnToRow {
                 String str1 = node.getChildren().get(0).getTitle();
                 if(str1.contains("肯定回答")){
                     String str2 = node.getChildren().get(0).getChildren().get(0).getTitle();
-                    String value = str2.replace("赋值：", "").trim().replace("<br>", "").trim();
+                    String value = str2.replace("赋值：", "").trim()
+                            .replace("赋值:", "").trim()
+                            .replace("<br>", "").trim();
                     JSONObject defaultReply = new JSONObject();
                     defaultReply.put("affNegIntentionName", "肯定回答");
                     defaultReply.put("content", value.trim());

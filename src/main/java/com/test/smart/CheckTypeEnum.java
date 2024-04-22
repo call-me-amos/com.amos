@@ -62,7 +62,7 @@ public enum CheckTypeEnum {
 
     DECORATION_TYPE("7!711!71102!34", "装修类型"),
     DECORATION_TIME_NOT_SATISFIABLE("7!711!71102!35", "装修时间-三个月外"),
-    MEASUREMENT_TIME_NOT_SATISFIABLE("7!711!71102!36", "意向量房时间-一个月外"),
+    MEASUREMENT_TIME_NOT_SATISFIABLE("7!711!71102!36", "量房时间-一个月外"),
     COMPLETION_DATE_NOT_SATISFIABLE("7!711!71102!50", "交房时间-三个月后交房"),
 
     //房屋类型 - 细分意图
@@ -117,6 +117,7 @@ public enum CheckTypeEnum {
     HISTORY_QUESTION_DECOTIME_REPLY("7!711!71102!51","反问装修时间"),
     HISTORY_QUESTION_DECOTIME_ENQUIRE("7!711!71102!52","询问装修时间"),
 
+    REVERSE_TIME("7!711!71102!76", "反向-时间"),
 
     /**
      * 开场白澄清式槽位
@@ -218,9 +219,6 @@ public enum CheckTypeEnum {
     SLOT_FOR_RULE_81("7!711!71102!171","意向量房时间-意向量房时间段追问-当前+29"),
     SLOT_FOR_RULE_82("7!711!71102!172","意向量房时间-30天内交房"),
     SLOT_FOR_RULE_83("7!711!71102!173","交房时间-开始时间"),
-    SLOT_FOR_RULE_84("7!711!71102!174","意向量房时间-开始时间"),
-    SLOT_FOR_RULE_85("7!711!71102!175","意向量房时间-结束时间"),
-    SLOT_FOR_RULE_86("7!711!71102!176","意向量房时间-提取值"),
 
     SLOT_FOR_RULE_87("7!711!71102!177","小区名称-暂不方便沟通"),
     SLOT_FOR_RULE_88("7!711!71102!178","自建房小区名称"),

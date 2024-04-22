@@ -304,11 +304,13 @@ public class ProcessOnToRow {
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("子槽位")){
                         String subCheckTypeCode = subNode.getChildren().get(0).getTitle()
                                 .replace("子槽位：", "")
+                                .replace("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("subCheckTypeCode", CheckTypeEnum.getByName(subCheckTypeCode).getCode());
                         String content = subNode.getChildren().get(0)
                                 .getChildren().get(0).getTitle()
                                 .replace("话术内容：", "")
+                                .replace("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 5);
@@ -326,6 +328,7 @@ public class ProcessOnToRow {
                     String str2 = node.getChildren().get(0).getChildren().get(0).getTitle();
                     String value = str2.replace("赋值：", "").trim()
                             .replace("赋值:", "").trim()
+                            .replace("&nbsp;", "").trim()
                             .replace("<br>", "").trim();
                     JSONObject defaultReply = new JSONObject();
                     defaultReply.put("affNegIntentionName", "肯定回答");

@@ -12,10 +12,11 @@ import java.util.Map;
 
 public class RobotAskManager {
     private static final String ticket = //"";
-            "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
+            "?uid=13808&ticket=eds5uqLStVvQCjKEveag3VB4IEuGPvgERSx2Y3QOQpIfSRHZ0N3_vLtbkdyNYAq4dodN-vX9U7QfZrRAKjqhExd_pzDOaaV1sQVS5CXK2wuKspIyQD_4lwgyzEAJHTpq&appName=operat-tools&refsrc=%2F"
             ;
     //private static final String url_pre = "http://10.4.42.48:40121/";
     private static final String url_pre = "https://test-apigw.to8to.com/cgi/";
+    //private static final String url_pre = "https://apigw.to8to.com/cgi/";
 
     private static HttpUtils httpUtils = new HttpUtils();
     public static JSONObject queryContentByChatIdAndCheckTypeCode(String checkTypeCode){

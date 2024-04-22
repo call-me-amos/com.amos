@@ -272,13 +272,15 @@ public class ProcessOnToRow {
                     reply.put("delayTime", delayTime);
                     if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
                         String content = subNode.getChildren().get(0).getTitle()
-                                .replace("话术内容：", "");
+                                .replace("话术内容：", "")
+                                .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 0);
                         replyList.add(reply);
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("素材ID")){
                         String content = subNode.getChildren().get(0).getTitle()
-                                .replace("素材ID：", "");
+                                .replace("素材ID：", "")
+                                .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 3);
                         replyList.add(reply);
@@ -290,26 +292,31 @@ public class ProcessOnToRow {
                 sortForRobotAskProcessOn(node);
                 node.getChildren().forEach(subNode->{
                     JSONObject reply = new JSONObject();
-                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>","");
+                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>","").trim();
                     reply.put("delayTime", delayTime);
                     if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
                         String content = subNode.getChildren().get(0).getTitle()
-                                .replace("话术内容：", "");
+                                .replace("话术内容：", "")
+                                .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 0);
                         noResponseList.add(reply);
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("素材ID")){
                         String content = subNode.getChildren().get(0).getTitle()
-                                .replace("素材ID：", "");
+                                .replace("素材ID：", "")
+                                .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 3);
                         noResponseList.add(reply);
                     } else if(subNode.getChildren().get(0).getTitle().startsWith("子槽位")){
                         String subCheckTypeCode = subNode.getChildren().get(0).getTitle()
-                                .replace("子槽位：", "");
+                                .replace("子槽位：", "")
+                                .replace("<br>", "").trim();
                         reply.put("subCheckTypeCode", CheckTypeEnum.getByName(subCheckTypeCode).getCode());
                         String content = subNode.getChildren().get(0)
-                                .getChildren().get(0).getTitle().replace("话术内容：", "");
+                                .getChildren().get(0).getTitle()
+                                .replace("话术内容：", "")
+                                .replace("<br>", "").trim();
                         reply.put("content", content);
                         reply.put("type", 5);
                         noResponseList.add(reply);
@@ -320,7 +327,8 @@ public class ProcessOnToRow {
             } else if(node.getTitle().startsWith("槽位赋值")){
                 // TODO  赋值的逻辑先简单写死实现，后面再考虑支持条件
                 List<JSONObject> defaultReplyList = new ArrayList<>();
-                String str1 = node.getChildren().get(0).getTitle();
+                String str1 = node.getChildren().get(0).getTitle()
+                        .replace("<br>", "").trim();
                 if(str1.contains("肯定回答")){
                     String str2 = node.getChildren().get(0).getChildren().get(0).getTitle();
                     String value = str2.replace("赋值：", "").trim()

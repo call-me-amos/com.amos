@@ -40,7 +40,7 @@ public class ForRuleConditionMain {
      * 固定模板id
      */
     public static final int TEMPLATE_ID = 60; // 志威
-    //      public static final int TEMPLATE_ID = 64; // 志新
+    //       public static final int TEMPLATE_ID = 64; // 志新
 
     /**
      * 变量的默认值
@@ -79,7 +79,6 @@ public class ForRuleConditionMain {
 
             checkTypeCodeName = checkTypeCodeName.replaceAll("量房时间", "意向量房时间");
             checkTypeCodeName = checkTypeCodeName.replaceAll("意向意向量房时间", "意向量房时间");
-
             checkTypeCodeName = checkTypeCodeName.replaceAll("小区地址", "小区名称");
 
             if(null == CheckTypeEnum.getByName(checkTypeCodeName)){
@@ -138,7 +137,7 @@ public class ForRuleConditionMain {
             sb.append("\", \"");
             sb.append(row.get(2));
             sb.append("\",\"");
-            sb.append(row.get(3));
+            sb.append(convertToMvelExpressionForNextStrategy(row.get(3)));
             sb.append("\",\"");
             sb.append(ForRuleConditionMain.TEMPLATE_ID);
             sb.append("\"),");
@@ -156,6 +155,13 @@ public class ForRuleConditionMain {
         // .excelType(ExcelTypeEnum.XLSX)
         // .sheet("模板-01")
         // .doWrite(toExcelDataList);
+    }
+
+    private static String convertToMvelExpressionForNextStrategy(String logicDescription){
+        logicDescription = logicDescription
+                .replaceAll("量房时间", "意向量房时间")
+                .replaceAll("意向意向量房时间", "意向量房时间");
+        return logicDescription;
     }
 
     private static String convertToMvelExpression(String logicDescription) {

@@ -72,8 +72,8 @@ public class ProcessOnToRow {
                 skipSlot = "交房时间";
             } else if(secondNode.getTitle().startsWith("房子交房前能否提前进去看")){
                 skipSlot = "房子交房前能否提前进去看";
-            } else if(secondNode.getTitle().startsWith("量房时间")){
-                skipSlot = "量房时间";
+            } else if(secondNode.getTitle().startsWith("意向量房时间")){
+                skipSlot = "意向量房时间";
             } else if(secondNode.getTitle().startsWith("小区地址")){
                 skipSlot = "小区地址";
             }else if(secondNode.getTitle().startsWith("房屋面积")){

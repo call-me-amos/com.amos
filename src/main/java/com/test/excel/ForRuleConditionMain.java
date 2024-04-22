@@ -77,6 +77,11 @@ public class ForRuleConditionMain {
             List<JSONObject> defaultReplyList = null == paraMap.get("defaultReplyList")? Lists.newArrayList(): paraMap.get("defaultReplyList");
             List<JSONObject> noResponseList = null == paraMap.get("noResponseList")? Lists.newArrayList():paraMap.get("noResponseList");
 
+            checkTypeCodeName = checkTypeCodeName.replaceAll("量房时间", "意向量房时间");
+            checkTypeCodeName = checkTypeCodeName.replaceAll("意向意向量房时间", "意向量房时间");
+
+            checkTypeCodeName = checkTypeCodeName.replaceAll("小区地址", "小区名称");
+
             if(null == CheckTypeEnum.getByName(checkTypeCodeName)){
                 NO_CONFIG_NAME_FOR_ROBOT_ASK.add(checkTypeCodeName);
                 return;
@@ -160,6 +165,13 @@ public class ForRuleConditionMain {
         String[] lines = logicDescription.split("\\r?\\n");
         StringBuilder mvelExpressionBuilder = new StringBuilder();
         for (String line : lines) {
+            if(line.contains("量房时间")){
+                line = line.replaceAll("量房时间", "意向量房时间");
+                line = line.replaceAll("意向意向量房时间", "意向量房时间");
+            }
+
+            line = line.replaceAll("小区地址", "小区名称");
+
             String[] parts = line.split(" and ");
             dealSingleExpression(mvelExpressionBuilder, parts, " && ");
         }

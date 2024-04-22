@@ -80,8 +80,8 @@ public class ProcessOnToRow {
                 skipSlot = "房屋面积";
             } else if(secondNode.getTitle().startsWith("装修时间-引导")){
                 skipSlot = "装修时间-引导";
-            } else if(secondNode.getTitle().startsWith("电话")){
-                skipSlot = "电话";
+//            } else if(secondNode.getTitle().startsWith("电话")){
+//                skipSlot = "电话";
             } else if(secondNode.getTitle().startsWith("姓氏")){
                 skipSlot = "姓氏";
             } else {

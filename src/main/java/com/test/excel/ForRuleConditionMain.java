@@ -126,9 +126,6 @@ public class ForRuleConditionMain {
         //List<ToExcelData> toExcelDataList = new ArrayList<>();
         String versionNo = String.valueOf(System.currentTimeMillis());
         excelModelFromFileList.forEach(row -> {
-            if ("99999-下一槽位默认调整槽位--测试使用".equals(row.get(0))) {
-                System.out.println("");
-            }
             StringBuffer sb = new StringBuffer();
             sb.append("(\"");
             sb.append(versionNo);

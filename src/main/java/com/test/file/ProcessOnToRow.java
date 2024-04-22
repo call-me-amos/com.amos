@@ -104,13 +104,6 @@ public class ProcessOnToRow {
 //        });
 
 
-        LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
-        leafRule.put(0, "99999-下一槽位默认调整槽位--测试使用");// 规则名称
-        leafRule.put(1, "跳过槽位 <> ''");//规则条件
-        leafRule.put(2, "指定跳转");//跳转策略
-        leafRule.put(3, "姓氏");//跳转槽位
-        //log.info("新增一条规则：leafRule={}", JSONObject.toJSONString(leafRule));
-        EXCEL_MODEL_FROM_PROCESS_ON.add(leafRule);
     }
 
     public static JSONObject getJsonFromFile() {

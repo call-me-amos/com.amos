@@ -39,8 +39,8 @@ public class ForRuleConditionMain {
     /**
      * 固定模板id
      */
-    public static final int TEMPLATE_ID = 60; // 志威
-    //       public static final int TEMPLATE_ID = 64; // 志新
+    //       public static final int TEMPLATE_ID = 60; // 志威
+    public static final int TEMPLATE_ID = 64; // 志新
 
     /**
      * 变量的默认值
@@ -73,6 +73,7 @@ public class ForRuleConditionMain {
 
     private static void createRobotAsk(Map<String, Map<String, List<JSONObject>>> robotAskMap){
         robotAskMap.forEach((checkTypeCodeName, paraMap)->{
+
             List<JSONObject> replyList = null == paraMap.get("replyList")? Lists.newArrayList():paraMap.get("replyList");
             List<JSONObject> defaultReplyList = null == paraMap.get("defaultReplyList")? Lists.newArrayList(): paraMap.get("defaultReplyList");
             List<JSONObject> noResponseList = null == paraMap.get("noResponseList")? Lists.newArrayList():paraMap.get("noResponseList");
@@ -262,7 +263,16 @@ public class ForRuleConditionMain {
                 String value = tokens[1].trim();
                 String expressName = findExpressName(variableName);
                 value = getStringWithSingleQuotationMark(value, expressName);
-                mvelExpressionBuilder.append(expressName).append(" == ").append(value);
+
+                if(expressName.contains("HOUSE_TYPE_VALUE")){
+                    mvelExpressionBuilder
+                            .append(expressName)
+                            .append(".contains(")
+                            .append(value)
+                            .append(")");
+                } else {
+                    mvelExpressionBuilder.append(expressName).append(" == ").append(value);
+                }
             } else if (part.contains("不为空")) {
                 String[] tokens = part.split("不为空");
                 String variableName = tokens[0].trim();
@@ -299,7 +309,16 @@ public class ForRuleConditionMain {
                 String expressName = findExpressName(variableName);
                 value = getStringWithSingleQuotationMark(value, expressName);
 
-                mvelExpressionBuilder.append(expressName).append(" != ").append(value);
+                if(expressName.contains("HOUSE_TYPE_VALUE")){
+                    expressName = expressName.replace("HOUSE_TYPE_VALUE","!HOUSE_TYPE_VALUE");
+                    mvelExpressionBuilder
+                            .append(expressName)
+                            .append(".contains(")
+                            .append(value)
+                            .append(")");
+                } else {
+                    mvelExpressionBuilder.append(expressName).append(" != ").append(value);
+                }
             } else if (part.contains("小于")) {
                 String[] tokens = part.split("小于");
                 String variableName = tokens[0].trim();
@@ -353,6 +372,13 @@ public class ForRuleConditionMain {
     }
 
     // 补全左右括号
+
+    /**
+     *
+     * @param part  原始字符串
+     * @param subMvelExpressionBuilder  转义后的表达式
+     * @return
+     */
     private static String fillQuote(String part, StringBuilder subMvelExpressionBuilder) {
         int initLeftQuoteSize = countOccurrences(part, '(');
         int initRightQuoteSize = countOccurrences(part, ')');

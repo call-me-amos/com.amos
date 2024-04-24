@@ -31,17 +31,13 @@ import java.util.*;
 public class ForRuleConditionMain {
     // pos脑图文件路径
     public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略表格式-0414.pos";
+    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
     // private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
-
-//    private static final String FROM_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\智能应答策略2.0-7.xlsx";
-//    private static final String TO_FILE_NAME = "C:\\Users\\amos.tong\\Desktop\\条件跳转\\temp.xlsx";
 
     /**
      * 固定模板id
      */
-    //public static final int TEMPLATE_ID = 47;
-     public static final int TEMPLATE_ID = 60; // 志威
-    //       public static final int TEMPLATE_ID = 64; // 志新
+     public static final int TEMPLATE_ID = 60;
 
     public static final String ticket = //"";
             "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
@@ -81,7 +77,6 @@ public class ForRuleConditionMain {
 
     private static void createRobotAsk(Map<String, Map<String, List<JSONObject>>> robotAskMap){
         robotAskMap.forEach((checkTypeCodeName, paraMap)->{
-
             List<JSONObject> replyList = null == paraMap.get("replyList")? Lists.newArrayList():paraMap.get("replyList");
             List<JSONObject> defaultReplyList = null == paraMap.get("defaultReplyList")? Lists.newArrayList(): paraMap.get("defaultReplyList");
             List<JSONObject> noResponseList = null == paraMap.get("noResponseList")? Lists.newArrayList():paraMap.get("noResponseList");
@@ -109,7 +104,6 @@ public class ForRuleConditionMain {
             result = RobotAskManager.createOrUpdateRobotAskId(robotAskId, checkTypeCode, replyList, defaultReplyList, noResponseList);
             if(null == robotAskId){
                 robotAskId = result.getInteger("result");
-                //System.out.println("新增话术id=" + robotAskId);
                 RobotAskManager.effectOrInvalid(1, Arrays.asList(robotAskId));
             }
         });
@@ -131,9 +125,12 @@ public class ForRuleConditionMain {
     }
 
     public static void parseExcelModeToSql(List<LinkedHashMap<Integer, String>> excelModelFromFileList) {
-        //List<ToExcelData> toExcelDataList = new ArrayList<>();
+        List<InsertDiyRuleDTO> dataList = new ArrayList<>();
         String versionNo = String.valueOf(System.currentTimeMillis());
         excelModelFromFileList.forEach(row -> {
+            String condition = convertToMvelExpression(row.get(1));
+            String nextStrategy = convertToMvelExpressionForNextStrategy(row.get(3));
+
             StringBuffer sb = new StringBuffer();
             sb.append("(\"");
             sb.append(versionNo);
@@ -142,22 +139,33 @@ public class ForRuleConditionMain {
             sb.append("\", \"");
             sb.append(row.get(1));
             sb.append("\", \"");
-            sb.append(convertToMvelExpression(row.get(1)));// 条件
+            sb.append(condition);// 条件
             sb.append("\", \"");
             sb.append(row.get(2));
             sb.append("\",\"");
-            sb.append(convertToMvelExpressionForNextStrategy(row.get(3)));
+            sb.append(nextStrategy);
             sb.append("\",\"");
             sb.append(ForRuleConditionMain.TEMPLATE_ID);
             sb.append("\"),");
             // TODO 话术可以拼接 curl
 
+            // TODO
             System.out.println(sb);
 
-//            ToExcelData data = new ToExcelData();
-//            data.setSql(sb.toString());
-//            toExcelDataList.add(data);
+            InsertDiyRuleDTO dto = new InsertDiyRuleDTO();
+            dataList.add(dto);
+
+            dto.setRuleName(row.get(0));
+            dto.setRuleDescribe(row.get(1));
+            dto.setRuleCondition(condition);
+            dto.setNextStrategyType(row.get(2));
+            dto.setNextAskSlot(nextStrategy);
+            dto.setTemplateId(ForRuleConditionMain.TEMPLATE_ID);
         });
+
+//        log.info("json化规则：start");
+//        log.info("\r\n\r\n\r\n{}\r\n\r\n\r\n", JSONObject.toJSONString(dataList));
+//        log.info("json化规则：end");
 
         // EasyExcel
         // .write(TO_FILE_NAME, ToExcelData.class)
@@ -184,7 +192,7 @@ public class ForRuleConditionMain {
 
             line = line.replaceAll("小区地址", "小区名称");
 
-            String[] parts = line.split(" and ");
+            String[] parts = line.split("and");
             dealSingleExpression(mvelExpressionBuilder, parts, " && ");
         }
         return mvelExpressionBuilder.toString();
@@ -194,7 +202,7 @@ public class ForRuleConditionMain {
         for (int i = 0; i < parts.length; i++) {
             String part = parts[i];
             if (part.contains(" or ")) {
-                String[] tokens = part.split(" or ");
+                String[] tokens = part.split("or");
                 dealSingleExpression(mvelExpressionBuilder, tokens, " || ");
             } else if (part.contains("not in")) {
                 String[] tokens = part.split("not in");
@@ -231,8 +239,8 @@ public class ForRuleConditionMain {
 
                 String newStr = fillQuote(part, subMvelExpressionBuilder);
                 mvelExpressionBuilder.append(newStr);
-            } else if (part.contains(" in ")) {
-                String[] tokens = part.split(" in ");
+            } else if (part.contains("in")) {
+                String[] tokens = part.split("in");
                 String variableName = tokens[0].trim();
                 String valuesString = tokens[1].trim();
                 variableName = variableName.replace("（", "(");
@@ -505,25 +513,5 @@ public class ForRuleConditionMain {
         return map;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

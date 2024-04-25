@@ -30,14 +30,14 @@ import java.util.*;
 @Slf4j
 public class ForRuleConditionMain {
     // pos脑图文件路径
-    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略表格式-0414.pos";
-    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
+    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略表格式-0414.pos";
+    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
     // private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
 
     /**
      * 固定模板id
      */
-     public static final int TEMPLATE_ID = 60;
+     public static final int TEMPLATE_ID = 63;
 
     public static final String ticket = //"";
             "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
@@ -54,6 +54,12 @@ public class ForRuleConditionMain {
      * 没有配置的槽位
      */
     private static final Set<String> NO_CONFIG_NAME = Sets.newHashSet();
+
+    /**
+     * 没有配置的槽位
+     */
+    private static final Set<String> NO_CONFIG_FOR_NEXT_SLOT = Sets.newHashSet();
+
     /**
      * 没有配置的槽位
      */
@@ -66,7 +72,8 @@ public class ForRuleConditionMain {
         ProcessOnToRow.initExcelModelFromProcessOn();
         List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
-        System.out.println("ERROR 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
+        System.out.println("ERROR， 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
+        System.out.println("ERROR， 下一策略没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         createRobotAsk(robotAskMap);
@@ -161,6 +168,21 @@ public class ForRuleConditionMain {
             dto.setNextStrategyType(row.get(2));
             dto.setNextAskSlot(nextStrategy);
             dto.setTemplateId(ForRuleConditionMain.TEMPLATE_ID);
+
+            // 检查跳转策略是否配置
+            if(StringUtils.isNotEmpty(nextStrategy) && !"/".equals(nextStrategy)){
+                String[] nextStrategyList = nextStrategy.split("\\+");
+                for (int i = 0; i < nextStrategyList.length; i++) {
+                    String subNextStrategy = nextStrategyList[i].trim();
+                    if("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)){
+                        continue;
+                    }
+                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+                    if(null == checkTypeEnum){
+                        NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
+                    }
+                }
+            }
         });
 
 //        log.info("json化规则：start");

@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * 脑图节点对象
  * @author amos.tong
  */
 @Data

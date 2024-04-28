@@ -70,6 +70,11 @@ public class ForRuleConditionMain {
      */
     private static final Set<String> NO_CONFIG_NAME_FOR_ROBOT_ASK = Sets.newHashSet();
 
+    /**
+     * 初始化规则的sql
+     */
+    private static final List<String> INIT_RULE_SQL = Lists.newArrayList();
+
     public static void main(String[] args) throws FileNotFoundException {
         System.out.println("============  start");
         // File file = new File(FROM_FILE_NAME);
@@ -80,6 +85,7 @@ public class ForRuleConditionMain {
         System.out.println("ERROR， 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
         System.out.println("ERROR， 下一策略没有配置槽位: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
         System.out.println("ERROR， 下一策略没有配置话术: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK));
+        System.out.println("规则初始化sql： \r\n\r\n " + JSONObject.toJSONString(INIT_RULE_SQL));
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         // 【注意】线上环境慎用
@@ -163,8 +169,7 @@ public class ForRuleConditionMain {
             sb.append("\"),");
             // TODO 话术可以拼接 curl
 
-            // TODO
-            System.out.println(sb);
+            INIT_RULE_SQL.add(sb.toString());
 
             InsertDiyRuleDTO dto = new InsertDiyRuleDTO();
             dataList.add(dto);
@@ -176,57 +181,55 @@ public class ForRuleConditionMain {
             dto.setNextAskSlot(nextStrategy);
             dto.setTemplateId(ForRuleConditionMain.TEMPLATE_ID);
 
-
-
             // 检查跳转策略是否配置
-//            if(StringUtils.isNotEmpty(nextStrategy) && !"/".equals(nextStrategy)){
-//                // 自定义规则
-////                nextStrategy = nextStrategy.trim()
-////                        .replace(" ", "")
-////                        .replace("QA+", "")
-////                        .replace("回复QA+", "")
-////                        .replace("QA+", "")
-////                        .replace("+下一槽位", "")
-////                        .replace("下一槽位", "");
-////                if(StringUtils.isNotEmpty(nextStrategy)){
-////                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(nextStrategy);
-////                    if(null == checkTypeEnum){
-////                        NO_CONFIG_FOR_NEXT_SLOT.add(nextStrategy);
-////                    }
-////                }
-//
-//                // AI 外呼
-//                String[] nextStrategyList = nextStrategy.split(";|；");
-//
-//                for (int i = 0; i < nextStrategyList.length; i++) {
-//                    String subNextStrategy = nextStrategyList[i].trim();
-//                    if("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)){
-//                        continue;
-//                    }
-//                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+            if(StringUtils.isNotEmpty(nextStrategy) && !"/".equals(nextStrategy)){
+                // 自定义规则
+//                nextStrategy = nextStrategy.trim()
+//                        .replace(" ", "")
+//                        .replace("QA+", "")
+//                        .replace("回复QA+", "")
+//                        .replace("QA+", "")
+//                        .replace("+下一槽位", "")
+//                        .replace("下一槽位", "");
+//                if(StringUtils.isNotEmpty(nextStrategy)){
+//                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(nextStrategy);
 //                    if(null == checkTypeEnum){
-//                        NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
-//                    }
-//
-//                    if(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.contains(subNextStrategy)){
-//                        continue;
-//                    }
-//
-//                    CheckTypeEnum subNextStrategyCheckTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
-//                    if(null == subNextStrategyCheckTypeEnum){
-//                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
-//                        continue;
-//                    }
-//
-//                    String checkTypeCode = checkTypeEnum.getCode();
-//                    JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
-//
-//                    if(null != result.getJSONObject("result") && null != result.getJSONObject("result").getInteger("id")){
-//                    } else {
-//                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
+//                        NO_CONFIG_FOR_NEXT_SLOT.add(nextStrategy);
 //                    }
 //                }
-//            }
+
+                // AI 外呼
+                String[] nextStrategyList = nextStrategy.split(";|；");
+
+                for (String s : nextStrategyList) {
+                    String subNextStrategy = s.trim();
+                    if ("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)) {
+                        continue;
+                    }
+                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+                    if (null == checkTypeEnum) {
+                        NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
+                    }
+
+                    if (NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.contains(subNextStrategy)) {
+                        continue;
+                    }
+
+                    CheckTypeEnum subNextStrategyCheckTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+                    if (null == subNextStrategyCheckTypeEnum) {
+                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
+                        continue;
+                    }
+
+                    String checkTypeCode = checkTypeEnum.getCode();
+                    JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
+
+                    if (null != result.getJSONObject("result") && null != result.getJSONObject("result").getInteger("id")) {
+                    } else {
+                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
+                    }
+                }
+            }
         });
 
 //        log.info("json化规则：start");

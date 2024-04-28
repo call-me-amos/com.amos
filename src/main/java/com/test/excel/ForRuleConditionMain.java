@@ -31,14 +31,14 @@ import java.util.*;
 @Slf4j
 public class ForRuleConditionMain {
     // pos脑图文件路径
-    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略2.0-0414.pos";
-    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
+    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略2.0-0414.pos";
+    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
     // private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
 
     /**
      * 固定模板id
      */
-     public static final int TEMPLATE_ID = 60;
+     public static final int TEMPLATE_ID = 63;
 
     public static final String ticket = //"";
             "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
@@ -83,17 +83,19 @@ public class ForRuleConditionMain {
         ProcessOnToRow.initExcelModelFromProcessOn();
         List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
-        System.out.println("ERROR， 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
-        System.out.println("ERROR， 下一策略没有配置槽位: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
-        System.out.println("ERROR， 下一策略没有配置话术: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK));
-        System.out.println("规则初始化sql： \r\n\r\n " + INIT_RULE_SQL);
+        log.info("ERROR， 没有配置的槽位: {}" , JSONObject.toJSONString(NO_CONFIG_NAME));
+        log.info("ERROR， 下一策略没有配置槽位: {}", JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
+        log.info("ERROR， 下一策略没有配置话术: {}", JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK));
+
+        for (String ruleSql: INIT_RULE_SQL) {
+            System.out.println(ruleSql);
+        }
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         // 【注意】线上环境慎用
         createRobotAsk(robotAskMap);
-        System.out.println("ERROR， 生成话术的时候，没有配置该槽位：" + JSONObject.toJSONString(NO_CONFIG_NAME_FOR_ROBOT_ASK));
+        log.info("ERROR， 生成话术的时候，没有配置该槽位：{}" , JSONObject.toJSONString(NO_CONFIG_NAME_FOR_ROBOT_ASK));
 
-        System.out.println("===============");
     }
 
     private static void createRobotAsk(Map<String, Map<String, List<JSONObject>>> robotAskMap){
@@ -182,24 +184,7 @@ public class ForRuleConditionMain {
             dto.setNextAskSlot(nextStrategyStr);
             dto.setTemplateId(ForRuleConditionMain.TEMPLATE_ID);
 
-            // 自定义规则
-//                nextStrategy = nextStrategy.trim()
-//                        .replace(" ", "")
-//                        .replace("QA+", "")
-//                        .replace("回复QA+", "")
-//                        .replace("QA+", "")
-//                        .replace("+下一槽位", "")
-//                        .replace("下一槽位", "");
-//                if(StringUtils.isNotEmpty(nextStrategy)){
-//                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(nextStrategy);
-//                    if(null == checkTypeEnum){
-//                        NO_CONFIG_FOR_NEXT_SLOT.add(nextStrategy);
-//                    }
-//                }
-
-            // AI 外呼
-            List<String> nextStrategyList = JSONArray.parseArray(nextStrategyStr, String.class);
-
+            List<String> nextStrategyList = Arrays.asList(nextStrategyStr.split(";"));
             for (String s : nextStrategyList) {
                 String subNextStrategy = s.trim();
                 if ("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)) {

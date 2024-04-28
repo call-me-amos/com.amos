@@ -49,37 +49,37 @@ public class ProcessOnToRow {
     public static final LinkedHashMap<String, String> SECOND_NODE_TITLE_MAPPING = new LinkedHashMap<>();
 
     // AI 外呼
-    static {
-        SECOND_NODE_TITLE_MAPPING.put("开场问候", "开场问候");
-        SECOND_NODE_TITLE_MAPPING.put("开场白-澄清槽位", "开场白-澄清槽位");
-        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否同意加微", "仅加微-是否同意加微");
-        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否找到服务通知", "仅加微-是否找到服务通知");
-        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否服务通知加微成功", "仅加微-是否服务通知加微成功");
-        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否收到短信", "仅加微-是否收到短信");
-        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否短信加微成功", "仅加微-是否短信加微成功");
-        SECOND_NODE_TITLE_MAPPING.put("仅加微-结束语", "仅加微-结束语");
-        SECOND_NODE_TITLE_MAPPING.put("公共策略", "公共策略");
-    }
-    // 自定义规则
 //    static {
-//        SECOND_NODE_TITLE_MAPPING.put("公共策略", "");
-//        SECOND_NODE_TITLE_MAPPING.put("开场白", "开场白-澄清槽位");
-//        SECOND_NODE_TITLE_MAPPING.put("装修时间-初轮", "装修时间-初轮");
-//        SECOND_NODE_TITLE_MAPPING.put("房屋类型", "房屋类型");
-//        // SECOND_NODE_TITLE_MAPPING.put("需求类型-装修/定制", "需求类型-装修/定制");
-//        SECOND_NODE_TITLE_MAPPING.put("工程量", "工程量");
-//        SECOND_NODE_TITLE_MAPPING.put("装修用途", "装修用途");
-//        SECOND_NODE_TITLE_MAPPING.put("城市", "城市");
-//        SECOND_NODE_TITLE_MAPPING.put("是否交房", "是否交房");
-//        SECOND_NODE_TITLE_MAPPING.put("交房时间", "交房时间");
-//        SECOND_NODE_TITLE_MAPPING.put("房子交房前能否提前进去看", "房子交房前能否提前进去看");
-//        SECOND_NODE_TITLE_MAPPING.put("意向量房时间", "意向量房时间");
-//        SECOND_NODE_TITLE_MAPPING.put("小区名称", "小区名称");
-//        SECOND_NODE_TITLE_MAPPING.put("房屋面积", "房屋面积");
-//        SECOND_NODE_TITLE_MAPPING.put("装修时间-引导", "装修时间-引导");
-//        // SECOND_NODE_TITLE_MAPPING.put("电话", "电话");
-//        SECOND_NODE_TITLE_MAPPING.put("姓氏", "姓氏");
+//        SECOND_NODE_TITLE_MAPPING.put("开场问候", "开场问候");
+//        SECOND_NODE_TITLE_MAPPING.put("开场白-澄清槽位", "开场白-澄清槽位");
+//        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否同意加微", "仅加微-是否同意加微");
+//        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否找到服务通知", "仅加微-是否找到服务通知");
+//        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否服务通知加微成功", "仅加微-是否服务通知加微成功");
+//        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否收到短信", "仅加微-是否收到短信");
+//        SECOND_NODE_TITLE_MAPPING.put("仅加微-是否短信加微成功", "仅加微-是否短信加微成功");
+//        SECOND_NODE_TITLE_MAPPING.put("仅加微-结束语", "仅加微-结束语");
+//        SECOND_NODE_TITLE_MAPPING.put("公共策略", "公共策略");
 //    }
+    // 自定义规则
+    static {
+        SECOND_NODE_TITLE_MAPPING.put("公共策略", "");
+        SECOND_NODE_TITLE_MAPPING.put("开场白", "开场白-澄清槽位");
+        SECOND_NODE_TITLE_MAPPING.put("装修时间-初轮", "装修时间-初轮");
+        SECOND_NODE_TITLE_MAPPING.put("房屋类型", "房屋类型");
+        // SECOND_NODE_TITLE_MAPPING.put("需求类型-装修/定制", "需求类型-装修/定制");
+        SECOND_NODE_TITLE_MAPPING.put("工程量", "工程量");
+        SECOND_NODE_TITLE_MAPPING.put("装修用途", "装修用途");
+        SECOND_NODE_TITLE_MAPPING.put("城市", "城市");
+        SECOND_NODE_TITLE_MAPPING.put("是否交房", "是否交房");
+        SECOND_NODE_TITLE_MAPPING.put("交房时间", "交房时间");
+        SECOND_NODE_TITLE_MAPPING.put("房子交房前能否提前进去看", "房子交房前能否提前进去看");
+        SECOND_NODE_TITLE_MAPPING.put("意向量房时间", "意向量房时间");
+        SECOND_NODE_TITLE_MAPPING.put("小区名称", "小区名称");
+        SECOND_NODE_TITLE_MAPPING.put("房屋面积", "房屋面积");
+        SECOND_NODE_TITLE_MAPPING.put("装修时间-引导", "装修时间-引导");
+        // SECOND_NODE_TITLE_MAPPING.put("电话", "电话");
+        SECOND_NODE_TITLE_MAPPING.put("姓氏", "姓氏");
+    }
 
     public static void initExcelModelFromProcessOn() {
         JSONObject jsonObject = getJsonFromFile();
@@ -155,19 +155,19 @@ public class ProcessOnToRow {
 
             List<String> nextStrategyTypeList = Lists.newArrayList();
             List<String> nextAskSlotList = Lists.newArrayList();
-            if (nextStrategyType.contains(";")) {
+            for (String nextStrategy: nextStrategyType.split(";")) {
                 String nextAskSlot = null;
-                if ("下一槽位".equals(nextStrategyType)
-                        || "转人工".equals(nextStrategyType)
-                        || "闭环".equals(nextStrategyType)
-                        || "/".equals(nextStrategyType)) {
+                if ("下一槽位".equals(nextStrategy)
+                        || "转人工".equals(nextStrategy)
+                        || "闭环".equals(nextStrategy)
+                        || "/".equals(nextStrategy)) {
                     nextAskSlot = "/";
                 } else {
-                    nextAskSlot = nextStrategyType;
-                    nextStrategyType = "指定跳转";
+                    nextAskSlot = nextStrategy;
+                    nextStrategy = "指定跳转";
                 }
 
-                nextStrategyTypeList.add(nextStrategyType);
+                nextStrategyTypeList.add(nextStrategy);
                 nextAskSlotList.add(nextAskSlot);
             }
 
@@ -186,8 +186,8 @@ public class ProcessOnToRow {
             EXCEL_MODEL_FROM_PROCESS_ON.add(leafRule);
 
             if (CollectionUtils.isNotEmpty(node.getChildren())) {
-                parseForRobotAskList(nextAskSlotList.get(0), node.getChildren());
-
+                String nextAskSlot = CollectionUtils.isEmpty(nextAskSlotList)? "": nextAskSlotList.get(0);
+                parseForRobotAskList(nextAskSlot, node.getChildren());
                 sortForConditionProcessOn(node);
                 node.getChildren().forEach(childrenNode -> {
                     StringBuilder finalFatherRule = new StringBuilder();

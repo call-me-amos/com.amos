@@ -1,6 +1,7 @@
 package com.test.excel;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -30,14 +31,14 @@ import java.util.*;
 @Slf4j
 public class ForRuleConditionMain {
     // pos脑图文件路径
-    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略2.0-0414.pos";
-    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
+    public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略2.0-0414.pos";
+    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
     // private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
 
     /**
      * 固定模板id
      */
-     public static final int TEMPLATE_ID = 63;
+     public static final int TEMPLATE_ID = 60;
 
     public static final String ticket = //"";
             "?uid=20678&ticket=AWAMY52PNGc1k8Nvwm9Al0TrPqqemP8hQvGrnwlKVee3AnroX4IO1jHZEPDHT2EvZu6t8JtsW5txWWnDkLvMWbeLf4Cclu4YiGw4AnXnOwXwJQDg1CE9pjUMEiMmV2q5&appName=operat-tools&refsrc=%2F"
@@ -85,7 +86,7 @@ public class ForRuleConditionMain {
         System.out.println("ERROR， 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
         System.out.println("ERROR， 下一策略没有配置槽位: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
         System.out.println("ERROR， 下一策略没有配置话术: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK));
-        System.out.println("规则初始化sql： \r\n\r\n " + JSONObject.toJSONString(INIT_RULE_SQL));
+        System.out.println("规则初始化sql： \r\n\r\n " + INIT_RULE_SQL);
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
         // 【注意】线上环境慎用
@@ -149,7 +150,7 @@ public class ForRuleConditionMain {
         String versionNo = String.valueOf(System.currentTimeMillis());
         excelModelFromFileList.forEach(row -> {
             String condition = convertToMvelExpression(row.get(1));
-            String nextStrategy = convertToMvelExpressionForNextStrategy(row.get(3));
+            String nextStrategyStr = convertToMvelExpressionForNextStrategy(row.get(3));
 
             StringBuffer sb = new StringBuffer();
             sb.append("(\"");
@@ -163,7 +164,7 @@ public class ForRuleConditionMain {
             sb.append("\", \"");
             sb.append(row.get(2));
             sb.append("\",\"");
-            sb.append(nextStrategy);
+            sb.append(nextStrategyStr);
             sb.append("\",\"");
             sb.append(ForRuleConditionMain.TEMPLATE_ID);
             sb.append("\"),");
@@ -178,12 +179,10 @@ public class ForRuleConditionMain {
             dto.setRuleDescribe(row.get(1));
             dto.setRuleCondition(condition);
             dto.setNextStrategyType(row.get(2));
-            dto.setNextAskSlot(nextStrategy);
+            dto.setNextAskSlot(nextStrategyStr);
             dto.setTemplateId(ForRuleConditionMain.TEMPLATE_ID);
 
-            // 检查跳转策略是否配置
-            if(StringUtils.isNotEmpty(nextStrategy) && !"/".equals(nextStrategy)){
-                // 自定义规则
+            // 自定义规则
 //                nextStrategy = nextStrategy.trim()
 //                        .replace(" ", "")
 //                        .replace("QA+", "")
@@ -198,38 +197,38 @@ public class ForRuleConditionMain {
 //                    }
 //                }
 
-                // AI 外呼
-                String[] nextStrategyList = nextStrategy.split(";|；");
+            // AI 外呼
+            List<String> nextStrategyList = JSONArray.parseArray(nextStrategyStr, String.class);
 
-                for (String s : nextStrategyList) {
-                    String subNextStrategy = s.trim();
-                    if ("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)) {
-                        continue;
-                    }
-                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
-                    if (null == checkTypeEnum) {
-                        NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
-                    }
+            for (String s : nextStrategyList) {
+                String subNextStrategy = s.trim();
+                if ("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)) {
+                    continue;
+                }
+                CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+                if (null == checkTypeEnum) {
+                    NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
+                }
 
-                    if (NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.contains(subNextStrategy)) {
-                        continue;
-                    }
+                if (NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.contains(subNextStrategy)) {
+                    continue;
+                }
 
-                    CheckTypeEnum subNextStrategyCheckTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
-                    if (null == subNextStrategyCheckTypeEnum) {
-                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
-                        continue;
-                    }
+                CheckTypeEnum subNextStrategyCheckTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+                if (null == subNextStrategyCheckTypeEnum) {
+                    NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
+                    continue;
+                }
 
-                    String checkTypeCode = checkTypeEnum.getCode();
-                    JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
+                String checkTypeCode = checkTypeEnum.getCode();
+                JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
 
-                    if (null != result.getJSONObject("result") && null != result.getJSONObject("result").getInteger("id")) {
-                    } else {
-                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
-                    }
+                if (null != result.getJSONObject("result") && null != result.getJSONObject("result").getInteger("id")) {
+                } else {
+                    NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
                 }
             }
+
         });
 
 //        log.info("json化规则：start");

@@ -30,7 +30,7 @@ import java.util.*;
 @Slf4j
 public class ForRuleConditionMain {
     // pos脑图文件路径
-    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略表格式-0414.pos";
+    //public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\新策略2.0-0414.pos";
     public static final String filePath = "E:\\amos\\文档\\智能研发部\\规则跳转\\条件跳转-脑图\\仅加微流程-开发配置版.pos";
     // private static final String filePath = "C:\\Users\\amos.tong\\Desktop\\开始 (1).pos";
 
@@ -56,9 +56,14 @@ public class ForRuleConditionMain {
     private static final Set<String> NO_CONFIG_NAME = Sets.newHashSet();
 
     /**
-     * 没有配置的槽位
+     * 下一策略没有配置的槽位
      */
     private static final Set<String> NO_CONFIG_FOR_NEXT_SLOT = Sets.newHashSet();
+
+    /**
+     * 下一策略 没有配置话术
+     */
+    private static final Set<String> NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK = Sets.newHashSet();
 
     /**
      * 没有配置的槽位
@@ -73,9 +78,11 @@ public class ForRuleConditionMain {
         List<LinkedHashMap<Integer, String>> excelModelFromFileList = ProcessOnToRow.EXCEL_MODEL_FROM_PROCESS_ON;
         parseExcelModeToSql(excelModelFromFileList);
         System.out.println("ERROR， 没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_NAME));
-        System.out.println("ERROR， 下一策略没有配置的槽位: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
+        System.out.println("ERROR， 下一策略没有配置槽位: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT));
+        System.out.println("ERROR， 下一策略没有配置话术: " + JSONObject.toJSONString(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK));
 
         Map<String, Map<String, List<JSONObject>>> robotAskMap = ProcessOnToRow.ROBOT_ASK_LIST;
+        // 【注意】线上环境慎用
         createRobotAsk(robotAskMap);
         System.out.println("ERROR， 生成话术的时候，没有配置该槽位：" + JSONObject.toJSONString(NO_CONFIG_NAME_FOR_ROBOT_ASK));
 
@@ -169,20 +176,57 @@ public class ForRuleConditionMain {
             dto.setNextAskSlot(nextStrategy);
             dto.setTemplateId(ForRuleConditionMain.TEMPLATE_ID);
 
+
+
             // 检查跳转策略是否配置
-            if(StringUtils.isNotEmpty(nextStrategy) && !"/".equals(nextStrategy)){
-                String[] nextStrategyList = nextStrategy.split("\\+");
-                for (int i = 0; i < nextStrategyList.length; i++) {
-                    String subNextStrategy = nextStrategyList[i].trim();
-                    if("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)){
-                        continue;
-                    }
-                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
-                    if(null == checkTypeEnum){
-                        NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
-                    }
-                }
-            }
+//            if(StringUtils.isNotEmpty(nextStrategy) && !"/".equals(nextStrategy)){
+//                // 自定义规则
+////                nextStrategy = nextStrategy.trim()
+////                        .replace(" ", "")
+////                        .replace("QA+", "")
+////                        .replace("回复QA+", "")
+////                        .replace("QA+", "")
+////                        .replace("+下一槽位", "")
+////                        .replace("下一槽位", "");
+////                if(StringUtils.isNotEmpty(nextStrategy)){
+////                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(nextStrategy);
+////                    if(null == checkTypeEnum){
+////                        NO_CONFIG_FOR_NEXT_SLOT.add(nextStrategy);
+////                    }
+////                }
+//
+//                // AI 外呼
+//                String[] nextStrategyList = nextStrategy.split(";|；");
+//
+//                for (int i = 0; i < nextStrategyList.length; i++) {
+//                    String subNextStrategy = nextStrategyList[i].trim();
+//                    if("/".equals(subNextStrategy) || "下一槽位".equals(subNextStrategy)){
+//                        continue;
+//                    }
+//                    CheckTypeEnum checkTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+//                    if(null == checkTypeEnum){
+//                        NO_CONFIG_FOR_NEXT_SLOT.add(subNextStrategy);
+//                    }
+//
+//                    if(NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.contains(subNextStrategy)){
+//                        continue;
+//                    }
+//
+//                    CheckTypeEnum subNextStrategyCheckTypeEnum = CheckTypeEnum.getByName(subNextStrategy);
+//                    if(null == subNextStrategyCheckTypeEnum){
+//                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
+//                        continue;
+//                    }
+//
+//                    String checkTypeCode = checkTypeEnum.getCode();
+//                    JSONObject result = RobotAskManager.queryContentByChatIdAndCheckTypeCode(checkTypeCode);
+//
+//                    if(null != result.getJSONObject("result") && null != result.getJSONObject("result").getInteger("id")){
+//                    } else {
+//                        NO_CONFIG_FOR_NEXT_SLOT_ROBOT_ASK.add(subNextStrategy);
+//                    }
+//                }
+//            }
         });
 
 //        log.info("json化规则：start");

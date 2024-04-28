@@ -145,8 +145,8 @@ public class ProcessOnToRow {
             }
         } else if(title.startsWith("跳转策略：")){
             String nextStrategyType = title.replace("跳转策略：", "").trim();
-            nextStrategyType = nextStrategyType.replace("肯定+","");
-            nextStrategyType = nextStrategyType.replace("回复QA+","");
+            nextStrategyType = nextStrategyType.replace("肯定;","").replace("肯定；","");
+            nextStrategyType = nextStrategyType.replace("回复QA;","").replace("回复QA；","");
 
             String nextAskSlot = "/";
             if("下一槽位".equals(nextStrategyType)
@@ -354,6 +354,7 @@ public class ProcessOnToRow {
             }
 
             if (!robotAsk.isEmpty()){
+                nextAskSlot = nextAskSlot.split(";|；")[0];
                 ROBOT_ASK_LIST.put(nextAskSlot, robotAsk);
             }
         }

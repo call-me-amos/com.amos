@@ -3,12 +3,12 @@ package com.test.file;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.test.excel.ForRuleConditionMain;
 import com.test.file.data.ProcessOnNode;
 import com.test.smart.CheckTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
@@ -30,7 +30,7 @@ public class ProcessOnToRow {
     /**
      * 根据pos文件解析到的话术对象
      * key：核需编码
-     *      key：replyList和noResponseList
+     * key：replyList和noResponseList
      */
     public static final Map<String, Map<String, List<JSONObject>>> ROBOT_ASK_LIST = new HashMap<>();
 
@@ -47,6 +47,7 @@ public class ProcessOnToRow {
     }
 
     public static final LinkedHashMap<String, String> SECOND_NODE_TITLE_MAPPING = new LinkedHashMap<>();
+
     // AI 外呼
     static {
         SECOND_NODE_TITLE_MAPPING.put("开场问候", "开场问候");
@@ -80,7 +81,7 @@ public class ProcessOnToRow {
 //        SECOND_NODE_TITLE_MAPPING.put("姓氏", "姓氏");
 //    }
 
-    public static void initExcelModelFromProcessOn(){
+    public static void initExcelModelFromProcessOn() {
         JSONObject jsonObject = getJsonFromFile();
         JSONArray childrenArray = jsonObject.getJSONObject("diagram").getJSONObject("elements").getJSONArray("children");
         childrenArray.forEach(o -> {
@@ -89,14 +90,14 @@ public class ProcessOnToRow {
                     .replace("&nbsp;", "")
                     .replace("<br>", "").trim();
             skipSlot = SECOND_NODE_TITLE_MAPPING.get(title);
-            if(null == skipSlot){
+            if (null == skipSlot) {
                 //log.info("其他槽位，暂时不处理, secondNode={}", JSONObject.toJSONString(secondNode));
                 return;
             }
 
-            if(CollectionUtils.isNotEmpty(secondNode.getChildren())){
+            if (CollectionUtils.isNotEmpty(secondNode.getChildren())) {
                 sortForConditionProcessOn(secondNode);
-                secondNode.getChildren().forEach(children->{
+                secondNode.getChildren().forEach(children -> {
                     StringBuilder finalFatherRule1 = new StringBuilder();
                     parseNode(children, finalFatherRule1);
                 });
@@ -128,74 +129,86 @@ public class ProcessOnToRow {
         }
     }
 
-    public static void parseNode(ProcessOnNode node, StringBuilder fatherRule){
+    public static void parseNode(ProcessOnNode node, StringBuilder fatherRule) {
         String title = node.getTitle();
         title = title.replaceAll("（", "(");
         title = title.replaceAll("）", ")");
         title = title.replace("&nbsp;", "");
         title = title.replace("<br>", "");
         title = title.trim();
-        if(title.startsWith("备注") || title.startsWith("回复")){
-            if(CollectionUtils.isNotEmpty(node.getChildren())){
+        if (title.startsWith("备注") || title.startsWith("回复")) {
+            if (CollectionUtils.isNotEmpty(node.getChildren())) {
                 sortForConditionProcessOn(node);
-                node.getChildren().forEach(children->{
+                node.getChildren().forEach(children -> {
                     StringBuilder finalFatherRule1 = new StringBuilder(fatherRule);
                     parseNode(children, finalFatherRule1);
                 });
             }
-        } else if(title.startsWith("跳转策略：")){
+        } else if (title.startsWith("跳转策略：")) {
             String nextStrategyType = title.replace("跳转策略：", "").trim();
-            nextStrategyType = nextStrategyType.replace("肯定;","").replace("肯定；","");
-            nextStrategyType = nextStrategyType.replace("回复QA;","").replace("回复QA；","");
+            nextStrategyType = nextStrategyType
+                    .replaceAll("；", ";").trim()
+                    .replace("跳转策略：", "")
+                    .replace("跳转策略:", "")
+                    .replace("肯定;", "").replace("肯定；", "")
+                    .replace("回复QA;", "").replace("回复QA；", "");
 
-            String nextAskSlot = "/";
-            if("下一槽位".equals(nextStrategyType)
-                    || "转人工".equals(nextStrategyType)
-                    || "闭环".equals(nextStrategyType)
-                    || "/".equals(nextStrategyType)){
-            }else{
-                nextAskSlot = nextStrategyType;
-                nextStrategyType = "指定跳转";
+            List<String> nextStrategyTypeList = Lists.newArrayList();
+            List<String> nextAskSlotList = Lists.newArrayList();
+            if (nextStrategyType.contains(";")) {
+                String nextAskSlot = null;
+                if ("下一槽位".equals(nextStrategyType)
+                        || "转人工".equals(nextStrategyType)
+                        || "闭环".equals(nextStrategyType)
+                        || "/".equals(nextStrategyType)) {
+                    nextAskSlot = "/";
+                } else {
+                    nextAskSlot = nextStrategyType;
+                    nextStrategyType = "指定跳转";
+                }
+
+                nextStrategyTypeList.add(nextStrategyType);
+                nextAskSlotList.add(nextAskSlot);
             }
 
-            String ruleCondition = StringUtils.isEmpty(skipSlot)? fatherRule.toString(): "(跳过槽位 <> " + skipSlot + ") and "+ fatherRule;
+            String ruleCondition = StringUtils.isEmpty(skipSlot) ? fatherRule.toString() : "(跳过槽位 <> " + skipSlot + ") and " + fatherRule;
             // 新增一个叶子结点：规则名称	规则条件	跳转策略	跳转槽位    核需话术    超时话术
             LinkedHashMap<Integer, String> leafRule = new LinkedHashMap<>();
             int index = RULE_INDEX.incrementAndGet();
-//            if(index == 42){
-//                index = index+1-1;
-//            }
-            leafRule.put(0, index + "-"+node.getId());//规则名称 暂时用id替代
-            leafRule.put(1, ruleCondition);//规则条件
-            leafRule.put(2, nextStrategyType);//跳转策略
-            leafRule.put(3, nextAskSlot);//跳转槽位
-            //log.info("新增一条规则：leafRule={}", JSONObject.toJSONString(leafRule));
+            //规则名称 暂时用id替代
+            leafRule.put(0, index + "-" + node.getId());
+            //规则条件
+            leafRule.put(1, ruleCondition);
+            //跳转策略
+            leafRule.put(2, JSONObject.toJSONString(nextStrategyTypeList));
+            //跳转槽位
+            leafRule.put(3, JSONObject.toJSONString(nextAskSlotList));
             EXCEL_MODEL_FROM_PROCESS_ON.add(leafRule);
-            
-            if(CollectionUtils.isNotEmpty(node.getChildren())){
-                parseForRobotAskList(nextAskSlot, node.getChildren());
+
+            if (CollectionUtils.isNotEmpty(node.getChildren())) {
+                parseForRobotAskList(nextAskSlotList.get(0), node.getChildren());
 
                 sortForConditionProcessOn(node);
-                node.getChildren().forEach(childrenNode ->{
+                node.getChildren().forEach(childrenNode -> {
                     StringBuilder finalFatherRule = new StringBuilder();
                     parseNode(childrenNode, finalFatherRule);
                 });
             }
-        } else if(title.startsWith("条件")){
-            if(StringUtils.isNotEmpty(fatherRule.toString())){
+        } else if (title.startsWith("条件")) {
+            if (StringUtils.isNotEmpty(fatherRule.toString())) {
                 fatherRule.append(" and ");
             }
             String subExp = "";
             try {
                 String sub = title.replace(":", "：");
                 subExp = sub.substring(sub.indexOf("：") + 1);
-            } catch (Exception e){
+            } catch (Exception e) {
                 subExp = title;
             }
             fatherRule.append(" (" + subExp + ")");
-            if(CollectionUtils.isNotEmpty(node.getChildren())){
+            if (CollectionUtils.isNotEmpty(node.getChildren())) {
                 sortForConditionProcessOn(node);
-                node.getChildren().forEach(children->{
+                node.getChildren().forEach(children -> {
                     StringBuilder finalFatherRule = new StringBuilder(fatherRule);
                     parseNode(children, finalFatherRule);
                 });
@@ -207,23 +220,25 @@ public class ProcessOnToRow {
         }
     }
 
-    /** 核需话术和超时话术排序 */
+    /**
+     * 核需话术和超时话术排序
+     */
     private static void sortForRobotAskProcessOn(ProcessOnNode node) {
         node.getChildren().sort((o1, o2) -> {
             int sort1 = 0;
-            if(o1.getTitle().startsWith("延迟时间")){
+            if (o1.getTitle().startsWith("延迟时间")) {
                 try {
                     sort1 = Integer.parseInt(o1.getTitle().split("=")[1]);
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.info("配置错误{}", o1.getTitle());
                 }
             }
 
             int sort2 = 0;
-            if(o2.getTitle().startsWith("延迟时间")){
+            if (o2.getTitle().startsWith("延迟时间")) {
                 try {
                     sort2 = Integer.parseInt(o2.getTitle().split("=")[1]);
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.info("配置错误{}", o2.getTitle());
                 }
             }
@@ -231,56 +246,60 @@ public class ProcessOnToRow {
         });
     }
 
-    /** 条件排序 */
+    /**
+     * 条件排序
+     */
     private static void sortForConditionProcessOn(ProcessOnNode node) {
         node.getChildren().sort((o1, o2) -> {
             int sort1 = 0;
-            if(o1.getTitle().startsWith("条件")){
+            if (o1.getTitle().startsWith("条件")) {
                 try {
                     String sub = o1.getTitle().replace(":", "：");
                     sort1 = Integer.parseInt(sub.substring(2, sub.indexOf("：")));
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.info("配置错误{}", o1.getTitle());
                 }
             }
 
             int sort2 = 0;
-            if(o2.getTitle().startsWith("条件")){
+            if (o2.getTitle().startsWith("条件")) {
                 try {
                     String sub = o2.getTitle().replace(":", "：");
                     sort2 = Integer.parseInt(sub.substring(2, sub.indexOf("：")));
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.info("配置错误{}", o2.getTitle());
                 }
             }
-            return sort1-sort2;
+            return sort1 - sort2;
         });
     }
 
-    /**  解析跳转策略后面的话术   */
+    /**
+     * 解析跳转策略后面的话术
+     */
     private static void parseForRobotAskList(String nextAskSlot, List<ProcessOnNode> children) {
         Map<String, List<JSONObject>> robotAsk = new HashMap<>();
-        for (ProcessOnNode node: children) {
-            if(node.getTitle().startsWith("核需话术")){
+        for (ProcessOnNode node : children) {
+            if (node.getTitle().startsWith("核需话术")) {
                 List<JSONObject> replyList = new ArrayList<>();
                 sortForRobotAskProcessOn(node);
-                node.getChildren().forEach(subNode->{
+                node.getChildren().forEach(subNode -> {
                     JSONObject reply = new JSONObject();
-                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>","");
+                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>", "");
                     reply.put("delayTime", delayTime);
-                    if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
+                    if (subNode.getChildren().get(0).getTitle().startsWith("话术内容")) {
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("话术内容：", "")
                                 .replaceAll("&nbsp;", "").trim()
                                 .replace("<br>", "").trim();
 
-                        if(content.contains("现场量房先帮您延期预约到")){
+                        if (content.contains("现场量房先帮您延期预约到")) {
                             System.out.println("=====");
                         }
                         reply.put("content", content);
                         reply.put("type", 0);
                         replyList.add(reply);
-                    } else if(subNode.getChildren().get(0).getTitle().startsWith("素材ID")){
+                    } else if (subNode.getChildren().get(0).getTitle().startsWith("素材ID")) {
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("素材ID：", "")
                                 .replaceAll("&nbsp;", "").trim()
@@ -291,14 +310,14 @@ public class ProcessOnToRow {
                     }
                 });
                 robotAsk.put("replyList", replyList);
-            } else if(node.getTitle().startsWith("超时话术")){
+            } else if (node.getTitle().startsWith("超时话术")) {
                 List<JSONObject> noResponseList = new ArrayList<>();
                 sortForRobotAskProcessOn(node);
-                node.getChildren().forEach(subNode->{
+                node.getChildren().forEach(subNode -> {
                     JSONObject reply = new JSONObject();
-                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>","").trim();
+                    String delayTime = subNode.getTitle().split("=")[1].replace("<br>", "").trim();
                     reply.put("delayTime", delayTime);
-                    if(subNode.getChildren().get(0).getTitle().startsWith("话术内容")){
+                    if (subNode.getChildren().get(0).getTitle().startsWith("话术内容")) {
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("话术内容：", "")
                                 .replaceAll("&nbsp;", "").trim()
@@ -306,7 +325,7 @@ public class ProcessOnToRow {
                         reply.put("content", content);
                         reply.put("type", 0);
                         noResponseList.add(reply);
-                    } else if(subNode.getChildren().get(0).getTitle().startsWith("素材ID")){
+                    } else if (subNode.getChildren().get(0).getTitle().startsWith("素材ID")) {
                         String content = subNode.getChildren().get(0).getTitle()
                                 .replace("素材ID：", "")
                                 .replaceAll("&nbsp;", "").trim()
@@ -314,7 +333,7 @@ public class ProcessOnToRow {
                         reply.put("content", content);
                         reply.put("type", 3);
                         noResponseList.add(reply);
-                    } else if(subNode.getChildren().get(0).getTitle().startsWith("子槽位")){
+                    } else if (subNode.getChildren().get(0).getTitle().startsWith("子槽位")) {
                         String subCheckTypeCode = subNode.getChildren().get(0).getTitle()
                                 .replace("子槽位：", "")
                                 .replaceAll("&nbsp;", "").trim()
@@ -332,12 +351,12 @@ public class ProcessOnToRow {
 
                 });
                 robotAsk.put("noResponseList", noResponseList);
-            } else if(node.getTitle().startsWith("槽位赋值")){
+            } else if (node.getTitle().startsWith("槽位赋值")) {
                 // TODO  赋值的逻辑先简单写死实现，后面再考虑支持条件
                 List<JSONObject> defaultReplyList = new ArrayList<>();
                 String str1 = node.getChildren().get(0).getTitle()
                         .replace("<br>", "").trim();
-                if(str1.contains("肯定回答")){
+                if (str1.contains("肯定回答")) {
                     String str2 = node.getChildren().get(0).getChildren().get(0).getTitle();
                     String value = str2.replace("赋值：", "").trim()
                             .replace("赋值:", "").trim()
@@ -350,10 +369,10 @@ public class ProcessOnToRow {
                     defaultReplyList.add(defaultReply);
                 }
                 robotAsk.put("defaultReplyList", defaultReplyList);
-            } else{
+            } else {
             }
 
-            if (!robotAsk.isEmpty()){
+            if (!robotAsk.isEmpty()) {
                 nextAskSlot = nextAskSlot.split(";|；")[0];
                 ROBOT_ASK_LIST.put(nextAskSlot, robotAsk);
             }
